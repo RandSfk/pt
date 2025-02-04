@@ -1,7 +1,7 @@
 let botName = "";
 let prefix = ['.', '!'];
 let chatTp = "";
-let owner = "";
+let owner = "Rndxft";
 
 function sendKeyEvent(key, type) {
     var eventObj;
@@ -99,18 +99,34 @@ function command(user, msg, mtype) {
             reply('Saya adalah chatbot yang membantu dalam game ini!');
             break;
         case 'sit':
+            if (user !== owner) {
+                reply('');
+                break;
+            }
             reply('Shap duduk');
             sm('/sit');
             break;
         case 'stand':
+            if (user !== owner) {
+                reply('So asik lu '+user);
+                break;
+            }
             reply('Shap berdiri');
             sm('/stand');
             break;
         case 'fly':
+            if (user !== owner) {
+                reply('So asik lu '+user);
+                break;
+            }
             reply('Shap terbang');
             sm('/fly');
             break;
         case 'lay':
+            if (user !== owner) {
+                reply('So asik lu '+user);
+                break;
+            }
             reply('Shap berbaring');
             sm('/lay');
             break;
@@ -119,6 +135,10 @@ function command(user, msg, mtype) {
             sm('/sleep');
             break;
         case 'kiss':
+            if (user !== owner) {
+                reply('So asik lu '+user);
+                break;
+            }
             reply('Muacchhh');
             sm('/kiss');
             break;
@@ -171,6 +191,10 @@ function command(user, msg, mtype) {
 
 
         case 'left':
+            if (user !== owner) {
+                reply('So asik lu '+user);
+                break;
+            }
             sendKeyEvent(37, 'keydown'); // Press the left arrow key (keydown)
             setTimeout(() => {
                 sendKeyEvent(37, 'keyup'); // Release the left arrow key (keyup) after 1 second
@@ -178,6 +202,10 @@ function command(user, msg, mtype) {
             break;
 
         case 'up':
+            if (user !== owner) {
+                reply('So asik lu '+user);
+                break;
+            }
             sendKeyEvent(38, 'keydown'); // Press the up arrow key (keydown)
             setTimeout(() => {
                 sendKeyEvent(38, 'keyup'); // Release the up arrow key (keyup) after 1 second
@@ -185,6 +213,10 @@ function command(user, msg, mtype) {
             break;
 
         case 'right':
+            if (user !== owner) {
+                reply('So asik lu '+user);
+                break;
+            }
             sendKeyEvent(39, 'keydown');
             setTimeout(() => {
                 sendKeyEvent(39, 'keyup');
@@ -192,6 +224,10 @@ function command(user, msg, mtype) {
             break;
 
         case 'down':
+            if (user !== owner) {
+                reply('So asik lu '+user);
+                break;
+            }
             sendKeyEvent(40, 'keydown');
             setTimeout(() => {
                 sendKeyEvent(40, 'keyup');
