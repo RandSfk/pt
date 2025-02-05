@@ -680,5 +680,81 @@ function settingMenu() {
 
 };
 
+function modifyPage() {
+    var header = document.querySelector(".form-group.text-start.text-large h5");
+    if (header && header.textContent.trim() === "Server rules") {
+        header.textContent = "Pony Town-Bot";
+        header.style.textAlign = 'center';
+        header.style.marginTop = '20px';
+    }
+    var appVersion = document.querySelector(".app-version");
+    if (appVersion) {
+        appVersion.innerHTML = 'Pony Town Bot Version: <b class="me-2">1.0.0 Release</b> ' +
+                               '(<a class="text-muted" href="https://instagram.com/rand_sfk">My Instagram</a>)';
+    }
+    showMessage("============================");
+    showMessage("Author: @RandSfk");
+    showMessage("Version: 1.0");
+    showMessage("=================");
+    removeElement(".btn.btn-lg.btn-outline-patreon.d-block.mb-2");
+    removeElement(".btn.btn-default.rounded-0");
+    removeElement(".form-group .btn.btn-default[aria-label='Edit character']");
+    removeElement('.emote-container');
+    removeElement(".mx-auto.text-start.text-large");
+    removeElement(".list-rules");
+    removeElement(".text-end");
+    removeElement(".alert.alert-warning");
+    additionalModifications();
+}
+
+function additionalModifications() {
+    removeElement(".emote-container");
+    removeElement('.navbar.navbar-expand');
+    removeElement('.btn.btn-warning');
+    var serverInputs = document.querySelectorAll("#server-input");
+    serverInputs.forEach(input => input.style.display = "none");
+    removeElement('#button-reset');
+}
+
+function removeElement(selector) {
+    var element = document.querySelector(selector);
+    if (element) {
+        element.remove();
+    }
+}
+
+function showErrorMessage(message) {
+    var header = document.querySelector(".form-group.text-start.text-large h5");
+    var existingError = document.querySelector("#error-bot");
+
+    if (!existingError) {
+        var errorElement = document.createElement('p');
+        errorElement.innerHTML = message;
+        errorElement.style.color = "red";
+        errorElement.id = 'error-bot';
+        errorElement.style.textAlign = "center";
+
+        if (header) {
+            header.parentNode.insertBefore(errorElement, header);
+        }
+        setTimeout(() => {
+            if (errorElement.parentNode) {
+                errorElement.parentNode.removeChild(errorElement);
+            }
+        }, 2000);
+    }
+}
+function showMessage(message) {
+    var messageElement = document.createElement('p');
+    messageElement.textContent = message;
+    messageElement.style.textAlign = "center";
+    var rulesList = document.querySelector(".form-group.text-start.text-large");
+    if (rulesList) {
+        rulesList.parentNode.insertBefore(messageElement, rulesList.nextSibling);
+    }
+}
+
+
+modifyPage();
 observeChat();
 settingMenu();
