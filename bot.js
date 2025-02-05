@@ -623,10 +623,7 @@ function settingMenu() {
         console.error(error.message);
         setTimeout(settingMenu, 2000);
     }
-};
-observeChat();
-settingMenu();
-const button = document.querySelector('.btn.btn-primary');
+    const button = document.querySelector('.btn.btn-primary');
 button.addEventListener('click', function () {
     const ownerInput = document.getElementById('ownerInput');
     const botInput = document.getElementById('botInput');
@@ -668,3 +665,7 @@ button.addEventListener('click', function () {
     console.log("Chat Type:", chatTp);
     console.log("Apikey:", apiKey);
 });
+
+};
+observeChat();
+settingMenu();
