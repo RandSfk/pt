@@ -193,7 +193,6 @@ function observeChat() {
         }, 2000);
 
     } catch (error) {
-        console.error(error.message);
         setTimeout(observeChat, 2000);
     }
 }
@@ -744,18 +743,32 @@ function showErrorMessage(message) {
         }, 2000);
     }
 }
+
 function showMessage(message) {
+    // Cek jika pesan sudah ada di halaman
+    var existingMessages = document.querySelectorAll('.custom-message');
+    for (var i = 0; i < existingMessages.length; i++) {
+        if (existingMessages[i].textContent === message) {
+            return; // Jika pesan sudah ada, tidak menambahkannya lagi
+        }
+    }
+
     var messageElement = document.createElement('p');
     messageElement.textContent = message;
     messageElement.style.textAlign = "center";
+    messageElement.classList.add('custom-message'); // Menambahkan kelas agar bisa dicek di lain waktu
+
     var rulesList = document.querySelector(".form-group.text-start.text-large");
     if (rulesList) {
         rulesList.parentNode.insertBefore(messageElement, rulesList.nextSibling);
     }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    modifyPage();
-  });
+setInterval(function() {
+    var logoImage = document.querySelector('img[src="/assets/images/logo-large-57d9b1947a.png"][alt="Pony Town"]');
+    if (logoImage) {
+        modifyPage();
+    }
+}, 1500);
 observeChat();
 settingMenu();
