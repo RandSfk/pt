@@ -604,7 +604,7 @@ function settingMenu() {
     }
 
     .deropdown div {
-        padding: 5px 10px;
+        padding: 0px 0px;
         cursor: pointer;
     }
 
