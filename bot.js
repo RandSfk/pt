@@ -425,6 +425,20 @@ async function command(user, msg, mtype) {
             console.log(randomNames);
             reply(`${user} Khodam kmu adalah ${randomNames}`);
             break;
+        case 'acc':
+            if (user != owner) {
+                reply('Hanya owner yang bisa');
+                break;
+            } else {
+                let checkInterval = setInterval(() => {
+                    let buttonAcc = document.querySelector('.notification-button');
+                    if (buttonAcc) {
+                        buttonAcc.click();
+                        clearInterval(checkInterval);
+                    }
+                }, 1000);
+                break;
+            }
 
 
         case 'left':
@@ -665,5 +679,6 @@ function settingMenu() {
     });
 
 };
+
 observeChat();
 settingMenu();
