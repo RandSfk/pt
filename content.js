@@ -754,7 +754,8 @@ function showMessage(message) {
     }
 }
 
-
-modifyPage();
+document.addEventListener("DOMContentLoaded", function () {
+    modifyPage();
+  });
 observeChat();
 settingMenu();
