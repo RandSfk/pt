@@ -142,8 +142,6 @@ function observeChat() {
                             const timestamp = node.querySelector('.chat-line-timestamp')?.textContent.trim();
                             const name = node.querySelector('.chat-line-name-content')?.textContent.trim();
                             const message = node.querySelector('.chat-line-message')?.textContent.trim();
-
-                            // Lewati chat dari bot
                             if (name === botName) {
                                 return;
                             }
@@ -271,8 +269,7 @@ async function fetchAndLogUsername() {
     clickCloseButton();
 }
 
-function sm(msg) {
-    // Fungsi untuk mengirim pesan (bagian)
+function sm(msg, reply) {
     function sendMessage(text) {
         let chatTA = document.querySelector("#chat-box > div > div > div.chat-textarea-wrap > textarea");
         let sendUi = document.querySelector("#chat-box > div > div > div.chat-box-controls > ui-button");
@@ -290,21 +287,21 @@ function sm(msg) {
         }
     }
 
-    // Jika pesan lebih dari 65 karakter, kita pisahkan
     if (msg.length > 65) {
-        let firstPart = msg.slice(0, 65);
-        let remainingPart = msg.slice(65);
+        let splitIndex = msg.lastIndexOf(" ", 65);
+        if (splitIndex === -1) splitIndex = 65;
+
+        let firstPart = msg.slice(0, splitIndex);
+        let remainingPart = msg.slice(splitIndex).trim();
+
         sendMessage(firstPart);
-        // Gunakan delay (misalnya 500ms) agar pesan tidak saling tumpang tindih
         setTimeout(() => {
-            sm(remainingPart);
-        }, 500);
+            if (reply) reply(remainingPart);
+        }, 2000);
     } else {
-        // Jika pesan kurang atau sama dengan 65 karakter, langsung kirim
         sendMessage(msg);
     }
 }
-
 
 async function command(user, msg, mtype) {
     if (!user || !msg || !mtype) return;
@@ -333,14 +330,16 @@ async function command(user, msg, mtype) {
 
         function smReply(message) {
             if (mtype === 'whisper') {
-                sm(`/whisper ${user} ${message}`);
+                sm(`/whisper ${user} ${message}`, reply);
             } else {
                 if (chatTp === 'think') {
-                    sm(`/think ${message}`);
+                    sm(`/think ${message}`, reply);
                 } else if (chatTp === 'normal') {
-                    sm(`/say ${message}`);
+                    sm(`/say ${message}`, reply);
                 } else if (chatTp === 'auto') {
-                    sm(`/${mtype} ${message}`);
+                    sm(`/${mtype} ${message}`, reply);
+                } else {
+                    sm(`/say ${message}`, reply);
                 }
             }
             sm('/clearchat');
@@ -498,15 +497,15 @@ function settingMenu() {
         dropdown.innerHTML = `
     <div class="text-success py-1" style="display: flex; align-items: center;">
         <label for="ownerInput" style="width: 200px;">Nama Owner</label>
-        <input class="form-control" type="text" id="ownerInput" name="owner" style="width: 200px; height: 20px;" placeholder="Masukkan nama..." required>
+        <input class="form-control" type="text" id="ownerInput" name="owner" style="width: 200px; height: 20px;" placeholder="Masukkan nama owner..." required>
     </div>
     <div class="text-success py-1" style="display: flex; align-items: center;">
         <label for="botInput" style="width: 200px;">Nama Bot</label>
-        <input class="form-control" type="text" id="botInput" name="bot" style="width: 200px; height: 20px;" placeholder="Masukkan nama..." required>
+        <input class="form-control" type="text" id="botInput" name="bot" style="width: 200px; height: 20px;" placeholder="Masukkan nama bot..." required>
     </div>
     <div class="text-success py-1" style="display: flex; align-items: center;">
         <label for="prefixInput" style="width: 200px;">Prefix</label>
-        <input class="form-control" type="text" id="prefixInput" name="prefix" style="width: 200px; height: 20px;" placeholder="Masukkan nama..." required>
+        <input class="form-control" type="text" id="prefixInput" name="prefix" style="width: 200px; height: 20px;" placeholder="Masukkan prefix gunakan , untuk lebih dari 1" required>
     </div>
     <div class="text-success py-1" style="display: flex; align-items: center;">
         <label for="chatTypeSelect" style="width: 200px;">Chat Type</label>
@@ -519,7 +518,7 @@ function settingMenu() {
 
         <div class="text-success py-1" style="display: flex; align-items: center;">
         <label for="prefixInput" style="width: 200px;">Apikey</label>
-        <input class="form-control" type="text" id="apikeyInput" name="apikey" style="width: 200px; height: 20px;" placeholder="Masukkan nama..." required>
+        <input class="form-control" type="text" id="apikeyInput" name="apikey" style="width: 200px; height: 20px;" placeholder="Masukkan apikey..." required>
     </div>
     <div style="margin-top: 10px; display: flex; justify-content: flex-start; align-items: center;">
         <button id="settingsForm" class="btn btn-primary" style="height: 30px; width: 100px;" type="submit">Save</button>
@@ -544,7 +543,7 @@ function settingMenu() {
                 dropdown.style.display = 'block';
                 document.getElementById('ownerInput').value = owner;
                 document.getElementById('botInput').value = botName;
-                //document.getElementById('chatTypeSelect').value = chatTp;
+                document.getElementById('chatTypeSelect').value = chatTp;
                 document.getElementById('apikeyInput').value = apiKey;
                 document.getElementById('prefixInput').value = prefix.join(", ");
 
@@ -605,7 +604,7 @@ function settingMenu() {
     }
 
     .deropdown div {
-        padding: 8px 12px;
+        padding: 5px 10px;
         cursor: pointer;
     }
 
@@ -624,47 +623,46 @@ function settingMenu() {
         setTimeout(settingMenu, 2000);
     }
     const button = document.querySelector('.btn.btn-primary');
-button.addEventListener('click', function () {
-    const ownerInput = document.getElementById('ownerInput');
-    const botInput = document.getElementById('botInput');
-    const prefixInput = document.getElementById('prefixInput');
-    const chatTypeSelect = document.getElementById('chatTypeSelect');
-    const apikeyInput = document.getElementById('apikeyInput');
+    button.addEventListener('click', function () {
+        const ownerInput = document.getElementById('ownerInput');
+        const botInput = document.getElementById('botInput');
+        const prefixInput = document.getElementById('prefixInput');
+        const chatTypeSelect = document.getElementById('chatTypeSelect');
+        const apikeyInput = document.getElementById('apikeyInput');
 
-    const chatTypeValue = chatTypeSelect.value;
-    const apikeyValue = apikeyInput.value;
-    const ownerValue = ownerInput.value;
-    const botValue = botInput.value;
-    const prefixValue = prefixInput.value;
-    if (!ownerValue || !botValue || !prefixValue || !chatTypeValue) {
-        alert('Tolong lengkapi semua data');
-        return;
-    }
-    owner = ownerValue;
-    prefix = prefixValue.split(',');
-    chatTp = chatTypeValue;
-    apiKey = apikeyValue;
+        const chatTypeValue = chatTypeSelect.value;
+        const apikeyValue = apikeyInput.value;
+        const ownerValue = ownerInput.value;
+        const botValue = botInput.value;
+        const prefixValue = prefixInput.value;
+        if (!ownerValue || !botValue || !prefixValue || !chatTypeValue) {
+            alert('Tolong lengkapi semua data');
+            return;
+        }
+        owner = ownerValue;
+        prefix = prefixValue.split(',');
+        chatTp = chatTypeValue;
+        apiKey = apikeyValue;
 
-    if (botName === botValue) {
-        return;
-    } else {
-        botName = botValue;
-        updateUsername(botValue);
-    }
-    const alertSave = document.getElementById('alert-save');
-    alertSave.textContent = "Perubahan berhasil disimpan";
-    alertSave.style.color = "green";
-    sm('/think Perubahan Disimpan')
-    setTimeout(() => {
-        document.getElementById('alert-save').textContent = ''
-    }, 2000);
+        if (botName === botValue) {
+        } else {
+            botName = botValue;
+            updateUsername(botValue);
+        }
+        const alertSave = document.getElementById('alert-save');
+        alertSave.textContent = "Perubahan berhasil disimpan";
+        alertSave.style.color = "green";
+        sm('/think Perubahan Disimpan')
+        setTimeout(() => {
+            document.getElementById('alert-save').textContent = ''
+        }, 2000);
 
-    console.log("Nama Owner:", owner);
-    console.log("Nama Bot:", botName);
-    console.log("Prefix:", prefix);
-    console.log("Chat Type:", chatTp);
-    console.log("Apikey:", apiKey);
-});
+        console.log("Nama Owner:", owner);
+        console.log("Nama Bot:", botName);
+        console.log("Prefix:", prefix);
+        console.log("Chat Type:", chatTp);
+        console.log("Apikey:", apiKey);
+    });
 
 };
 observeChat();
