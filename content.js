@@ -350,7 +350,7 @@ async function command(user, msg, mtype) {
             reply('pong!');
             break;
         case 'help':
-            reply('Command tersedia: ping, help, say, info');
+            reply('Command tersedia: ping, help, say, info, cek_khodam');
             break;
         case 'say':
             reply(text || 'Ketik sesuatu setelah !say');
@@ -389,6 +389,7 @@ async function command(user, msg, mtype) {
         case 'reset':
             reply("direset");
             tempHistory = {};
+            break;
         case 'botinfo':
             reply(`Nama bot: ${botName}`);
             reply(`Prefix: ${prefix}`);
