@@ -558,7 +558,6 @@ function settingMenu() {
     .custom-blocks {
         position: relative;
         display: inline-block;
-        width: 30%;
     }
 
     .tombol-setting {
@@ -590,6 +589,7 @@ function settingMenu() {
         display: none;
         z-index: 1;
         margin-top: 50px;
+        width: 290px;
     }
 
     .deropdown::before {
