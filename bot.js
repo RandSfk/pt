@@ -558,6 +558,7 @@ function settingMenu() {
     .custom-blocks {
         position: relative;
         display: inline-block;
+        width: 30%;
     }
 
     .tombol-setting {
@@ -585,7 +586,7 @@ function settingMenu() {
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         border-radius: 5px;
         padding: 10px;
-        min-width: 100px;
+        min-width: 10px;
         display: none;
         z-index: 1;
         margin-top: 50px;
