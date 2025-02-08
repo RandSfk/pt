@@ -8,6 +8,10 @@ let owner = "";
 
 let lastBotName = "";
 let lastOwner = "";
+let storyQueue = {};
+let storyRooms = {};
+let isMakingStory = false;
+let isGuessing = false;
 
 async function chatAi(username, message) {
     const headers = {
@@ -238,7 +242,7 @@ async function fetchAndLogUsername() {
     clickCloseButton();
 }
 
-function sm(msg, reply) {
+function sm(msg, mtype = "", user = "") {
     function sendMessage(text) {
         let chatTA = document.querySelector("#chat-box > div > div > div.chat-textarea-wrap > textarea");
         let sendUi = document.querySelector("#chat-box > div > div > div.chat-box-controls > ui-button");
@@ -256,37 +260,149 @@ function sm(msg, reply) {
         }
     }
 
-    if (msg.length > 65) {
-        let splitIndex = msg.lastIndexOf(" ", 65);
-        if (splitIndex === -1) splitIndex = 65;
+    function splitAndSend(text) {
+        let parts = text.split(/\n|\/n/);
+        let messages = [];
 
-        let firstPart = msg.slice(0, splitIndex);
-        let remainingPart = msg.slice(splitIndex).trim();
+        for (let part of parts) {
+            while (part.length > 65) {
+                let splitIndex = part.lastIndexOf(" ", 65);
+                if (splitIndex === -1) splitIndex = 65;
 
-        sendMessage(firstPart);
-        setTimeout(() => {
-            if (reply) reply(remainingPart);
-        }, 2000);
-    } else {
-        sendMessage(msg);
+                messages.push(part.slice(0, splitIndex));
+                part = part.slice(splitIndex).trim();
+            }
+            messages.push(part);
+        }
+
+        messages = messages.filter(m => m.length > 0);
+
+        let index = 0;
+        function sendNext() {
+            if (index < messages.length) {
+                let formattedMsg = messages[index];
+
+                if (mtype === "whisper" && user) {
+                    formattedMsg = `/whisper ${user} ${formattedMsg}`;
+                } else if (mtype === "think") {
+                    formattedMsg = `/think ${formattedMsg}`;
+                } else if (mtype === "say") {
+                    formattedMsg = `/say ${formattedMsg}`;
+                } else if (mtype === "auto") {
+                    formattedMsg = `/${mtype} ${formattedMsg}`;
+                }
+
+                sendMessage(formattedMsg);
+                index++;
+                setTimeout(sendNext, 3000);
+            }
+        }
+        sendNext();
     }
+
+    splitAndSend(msg);
 }
 
 async function command(user, msg, mtype) {
     if (!user || !msg || !mtype) return;
     console.log(`${user}: ${msg}`);
     if (!prefix.some(p => msg.startsWith(p))) return;
-
     let args = msg.split(' ');
     let cmd = args.shift().substring(1);
     let text = args.join(' ');
-
     let lastReplyTime = 0;
 
+    // Story command
+    function startMakeStory(user, numPlayers) {
+        if (isMakingStory) {
+            sm(`${user} sudah membuat room cerita.`);
+            return;
+        }
+
+        storyRooms = {
+            players: [user],
+            story: [],
+            numPlayers: numPlayers,
+            isFinished: false
+        };
+
+        console.log(storyRooms.players.length);
+        reply(`Room cerita dibuat oleh ${user}. Butuh ${numPlayers} pemain. Gunakan .join untuk bergabung!`);
+
+        let interval = setInterval(() => {
+            if (storyRooms.isFinished) {
+                isMakingStory = false;
+                storyRooms = {};
+                clearInterval(interval);
+                return;
+            }
+
+            if (storyRooms.players.length >= storyRooms.numPlayers) {
+                isMakingStory = true;
+                reply(`Room cerita akan dimulai.`);
+                storyRooms.players = storyRooms.players.sort(() => Math.random() - 0.5);
+                sm(`${storyRooms.players[0]} Silahkan whisper untuk mulai menulis cerita`, "whisper", storyRooms.players[0]);
+                clearInterval(interval);
+            }
+        }, 2000);
+    }
+
+
+    function joinStoryRoom(user) {
+        console.log(storyRooms);
+        if (!storyRooms.players) {
+            reply(`Belum ada room cerita yang dibuat.`);
+            return;
+        }
+
+        console.log(storyRooms.players.length);
+        if (storyRooms.players.length >= storyRooms.numPlayers) {
+            reply(`Room cerita sudah penuh.`);
+            return;
+        }
+        if (storyRooms.players.includes(user)) {
+            reply(`${user} sudah bergabung ke room cerita.`);
+            return;
+        }
+        storyRooms.players.push(user);
+        reply(`${user} bergabung ke room cerita.`);
+    }
+
+    function handleWhisper(user, message) {
+        if (mtype !== 'whisper') return;
+        if (!message || message.trim() === "") return;
+        if (!storyRooms.players.includes(user)) {
+            reply(`${user} tidak bergabung ke room cerita.`);
+            return;
+        }
+        if (!storyRooms.currentTurn) {
+            storyRooms.currentTurn = 0;
+        }
+        let currentPlayer = storyRooms.players[storyRooms.currentTurn];
+        if (user !== currentPlayer) {
+            let lastPart = storyRooms.story.length > 0 ? `Bagian terakhir: "${storyRooms.story[storyRooms.story.length - 1]}"` : "Cerita baru akan dimulai.";
+            sm(`${currentPlayer} untuk menambahkan cerita.\n${lastPart}`, mtype = "whisper", user = currentPlayer);
+            return;
+        }
+        storyRooms.story.push(`${message}`);
+        if (storyRooms.currentTurn >= storyRooms.players.length - 1) {
+            let finalStory = storyRooms.story.join("\n");
+            sm(`/say Cerita selesai:\n${finalStory}`);
+            storyRooms.isFinished = true;
+            storyRooms = {};
+            isMakingStory = false;
+            return;
+        }
+        storyRooms.currentTurn++;
+        let nextPlayer = storyRooms.players[storyRooms.currentTurn];
+        let lastPart = storyRooms.story[storyRooms.story.length - 1];
+        sm(`${nextPlayer} sekarang giliran kamu\nuntuk melanjutkan cerita!\nBagian terakhir: "${lastPart}"`, mtype = "whisper", user = nextPlayer);
+
+    }
     function reply(message) {
         const now = Date.now();
         const timeDifference = now - lastReplyTime;
-        const minInterval = 2000;
+        const minInterval = 1500;
         if (timeDifference < minInterval) {
             setTimeout(() => {
                 smReply(message);
@@ -298,29 +414,79 @@ async function command(user, msg, mtype) {
         }
 
         function smReply(message) {
-            if (mtype === 'whisper') {
-                sm(`/whisper ${user} ${message}`, reply);
-            } else {
-                if (chatTp === 'think') {
-                    sm(`/think ${message}`, reply);
-                } else if (chatTp === 'normal') {
-                    sm(`/say ${message}`, reply);
-                } else if (chatTp === 'auto') {
-                    sm(`/${mtype} ${message}`, reply);
-                } else {
-                    sm(`/say ${message}`, reply);
-                }
-            }
+            const messages = message.split(/\/n|\n/).map(msg => msg.trim()).filter(msg => msg.length > 0);
+            let delay = 0;
+            messages.forEach((msg, index) => {
+                setTimeout(() => {
+                    if (mtype === 'whisper') {
+                        sm(`/whisper ${user} ${msg}`, reply);
+                    } else {
+                        if (chatTp === 'think') {
+                            sm(`/think ${msg}`, reply);
+                        } else if (chatTp === 'normal') {
+                            sm(`/say ${msg}`, reply);
+                        } else if (chatTp === 'auto') {
+                            sm(`/${mtype} ${msg}`, reply);
+                        } else {
+                            sm(`/say ${msg}`, reply);
+                        }
+                    }
+                }, delay);
+                delay += 1500;
+            });
+
             sm('/clearchat');
         }
     }
+    const commands = {
+        ping: 'pong!',
+        help: 'Menampilkan perintah yang tersedia',
+        say: 'Ketik sesuatu setelah !say',
+        info: 'Informasi tentang bot',
+        botinfo: 'Menampilkan informasi tentang bot',
+        cek_khodam: 'Menampilkan khodam milikmu',
+        make_story: 'Rangkai cerita bersama teman mu',
+        puji: 'Buat bot memuji dirimu sendiri',
+        tebak_emoji: "Tebak kata dari emoji yang diberikan"
+    };
+
+    const ownerCommands = {
+        reset: 'Mereset history AI',
+        acc: 'Akses akun spesial',
+
+    };
+    function formatDate() {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const today = new Date();
+        return today.toLocaleDateString('id-ID', options);
+    }
 
     switch (cmd) {
-        case 'ping':
-            reply('pong!');
+        case 'make_story':
+            const numPlayers = parseInt(text, 10);
+            if (isNaN(numPlayers) || numPlayers <= 1) {
+                reply('Tolong masukkan jumlah pemain yang valid (minimal 2)!');
+                break;
+            }
+            startMakeStory(user, numPlayers);
             break;
+
+        case 'join':
+            joinStoryRoom(user);
+            break;
+
+        case 'menu':
+        case 'command':
+        case 'cmd':
         case 'help':
-            reply('Command tersedia: ping, help, say, info, cek_khodam');
+            const availableCommands = Object.keys(commands);
+            const commandList = availableCommands.map(cmd => `${cmd} - ${commands[cmd]}`).join('\n');
+            if (user === owner) {
+                const ownerCommandList = Object.keys(ownerCommands).map(cmd => `${cmd} - ${ownerCommands[cmd]}`).join('\n');
+                reply(`Hallo Tuan/Nyonya ${user} \nSekarang tanggal: ${formatDate()}\nPerintah yang tersedia:\n${commandList}\n\n${ownerCommandList}`);
+            } else {
+                reply(`Hallo ${user} \nSekarang tanggal: ${formatDate()}\nPerintah yang tersedia:\n${commandList}`);
+            }
             break;
         case 'say':
             reply(text || 'Ketik sesuatu setelah !say');
@@ -329,36 +495,32 @@ async function command(user, msg, mtype) {
             reply('Saya adalah chatbot yang membantu dalam game ini!');
             break;
         case 'sit':
-            reply('Shap duduk');
-            sm('/sit');
+            reply(user === owner ? sm('/sit') : `Hanya ${owner || 'Owner'} yang bisa menggunakan perintah ini.`);
             break;
         case 'stand':
-            reply('Shap berdiri');
-            sm('/stand');
+            reply(user === owner ? sm('/stand') : `Hanya ${owner || 'Owner'} yang bisa menggunakan perintah ini.`);
             break;
         case 'fly':
-            reply('Shap terbang');
-            sm('/fly');
+            reply(user === owner ? sm('/fly') : `Hanya ${owner || 'Owner'} yang bisa menggunakan perintah ini.`);
             break;
         case 'lay':
-            reply('Shap berbaring');
-            sm('/lay');
+            reply(user === owner ? sm('/lay') : `Hanya ${owner || 'Owner'} yang bisa menggunakan perintah ini.`);
             break;
         case 'sleep':
-            reply('Shap tidur');
-            sm('/sleep');
+            reply(user === owner ? sm('/sleep') : `Hanya ${owner || 'Owner'} yang bisa menggunakan perintah ini.`);
             break;
         case 'kiss':
-            reply('Muacchhh');
-            sm('/kiss');
+            reply(user === owner ? sm('/kiss') : `Hanya ${owner || 'Owner'} yang bisa menggunakan perintah ini.`);
             break;
         case 'turn':
-            reply('Shap putar');
-            sm('/turn');
+            reply(user === owner ? sm('/turn') : `Hanya ${owner || 'Owner'} yang bisa menggunakan perintah ini.`);
             break;
         case 'reset':
             if (!apiKey) {
-                balas = user === owner ? "Anda owner" : "Anda bukan owner";
+                balas = user === owner ? "Anda owner, history telah direset" : "Anda bukan owner, history tidak direset";
+                if (user === owner) {
+                    tempHistory = {};
+                }
             } else {
                 if (user !== owner) {
                     balas = await chatAi(user, "Aku bukan owner mu dan ingin reset kamu");
@@ -366,22 +528,17 @@ async function command(user, msg, mtype) {
                     tempHistory = {};
                     balas = await chatAi(user, "Aku RandSfk ingin mereset mu");
                 }
+                console.log("Online");
             }
-
             if (typeof balas === "string") {
-                reply({ message: balas });
+                reply(balas);
             } else if (balas && balas.message) {
                 reply(balas);
             }
-
             break;
         case 'botinfo':
-            reply(`Nama bot: ${botName}`);
-            reply(`Prefix: ${prefix}`);
-            reply(`Chat type: ${chatTp}`);
-            reply(`Owner: ${owner}`);
+            reply(`Nama bot: ${botName}\nPrefix: ${prefix}\nChat type: ${chatTp}\nOwner: ${owner}`);
             break;
-
         case 'ck':
         case 'my_khodam':
         case 'khodam':
@@ -430,8 +587,6 @@ async function command(user, msg, mtype) {
                 'Raja Singa Berkepala Gila',
                 'Ikan Hiu Punya Keahlian Masak'
             ];
-
-            // For Owner - Dark, Powerful, and Epic Khodams
             let owner_khodams = [
                 'Dark Demon Lord of the Abyss',
                 'Lord of the Black Flames',
@@ -463,6 +618,48 @@ async function command(user, msg, mtype) {
             }
             reply(`${user} Khodam kmu adalah ${khodam}`);
             break;
+        case 'puji':
+            let list_pujian = [
+                'adalah bintang yang bersinar terang!',
+                'punya aura yang mempesona!',
+                'selalu membuat suasana menjadi lebih baik!',
+                'adalah inspirasi bagi banyak orang!',
+                'memiliki hati yang penuh kebaikan!',
+                'adalah orang yang cerdas dan kreatif!',
+                'punya senyuman yang bisa mencairkan es!',
+                'adalah sosok yang luar biasa!',
+                'punya bakat alami yang luar biasa!',
+                'selalu tahu bagaimana membuat orang lain bahagia!',
+                'adalah kombinasi sempurna antara kecerdasan dan pesona!',
+                'punya jiwa yang kuat dan tak tergoyahkan!',
+                'adalah sahabat yang luar biasa!',
+                'membawa kebahagiaan ke mana pun ia pergi!',
+                'selalu memberikan energi positif kepada semua orang!',
+                'punya semangat yang membara dan tak mudah padam!'
+            ];
+
+            let owner_pujian = [
+                'adalah penguasa cahaya dan kegelapan!',
+                'memancarkan aura kekuatan yang luar biasa!',
+                'tak tertandingi dalam kebijaksanaan dan kekuatan!',
+                'adalah pemimpin yang ditakuti sekaligus dihormati!',
+                'punya jiwa seorang raja sejati!',
+                'adalah legenda yang akan selalu dikenang!',
+                'menginspirasi bahkan para dewa!',
+                'adalah sosok agung yang menguasai alam semesta!',
+                'punya kendali penuh atas takdir!',
+                'adalah satu-satunya yang layak disebut penguasa sejati!'
+            ];
+
+            let pujian;
+            if (user === owner) {
+                pujian = owner_pujian[Math.floor(Math.random() * owner_pujian.length)];
+            } else {
+                pujian = list_pujian[Math.floor(Math.random() * list_pujian.length)];
+            }
+
+            reply(`${user} ${pujian}`);
+            break;
 
         case 'acc':
             if (user != owner) {
@@ -483,7 +680,7 @@ async function command(user, msg, mtype) {
         case 'right':
         case 'down':
             if (user != owner) {
-                reply('Hanya owner yang bisa');
+                reply(`Hanya ${owner || 'Owner'} yang bisa menggunakan perintah ini.`);
                 break;
             }
             let movementRegex = /\((\d+)\)/;
@@ -510,23 +707,155 @@ async function command(user, msg, mtype) {
                 }
             }
             break;
+        case 'tebak_emoji_multiplayer':
+            let emojiList = [
+                'Hari yang Cerah',
+                'Pohon yang Tinggi',
+                'Sungai yang Mengalir',
+                'Matahari Terbenam',
+                'Bunga yang Mekar',
+                'Awan Berarak',
+                'Bintang di Langit',
+                'Salju yang Turun',
+                'Kupu-Kupu Terbang',
+                'Burung yang Terbang',
+                'Pemandangan Laut',
+                'Gunung yang Tinggi',
+                'Kucing Lucu',
+                'Anjing Berlari',
+                'Pelangi Setelah Hujan',
+                'Pasir Pantai',
+                'Sapu yang Digunakan untuk Bersih-Bersih',
+                'Gelas yang Penuh Air',
+                'Malam yang Tenang',
+                'Api yang Menyala',
+                'Angin Pagi yang Sejuk',
+                'Langit yang Biru',
+                'Daun yang Berguguran',
+                'Kelelawar Terbang di Malam Hari',
+                'Taman yang Rindang',
+                'Hujan yang Deras',
+                'Cahaya Lampu Jalan di Malam Hari',
+                'Kapal Laut Berlayar',
+                'Kue yang Enak',
+                'Bola yang Melambung',
+                'Senyum yang Manis',
+                'Cinta yang Mengalir',
+                'Tegangan di Udara',
+                'Hutan yang Rimbun',
+                'Langit Penuh Bintang',
+                'Makan Siang yang Nikmat',
+                'Darat yang Luas',
+                'Petualangan Baru',
+                'Kuda yang Berlari Cepat',
+                'Musim Semi yang Segar',
+                'Ombak Laut yang Tenang',
+                'Bersantai di Pantai',
+                'Menatap Kejauhan',
+                'Rembulan di Malam Hari',
+                'Sinar Matahari Pagi',
+                'Suara Alam yang Menenangkan',
+                'Gugusan Pulau di Lautan',
+                'Hujan Rintik yang Menenangkan',
+                'Daun yang Tersapu Angin',
+                'Pasar yang Ramai',
+                'Kampung yang Damai',
+                'Lampu Kota di Malam Hari',
+                'Sungai yang Mengalir Deras',
+                'Badai yang Mengguncang',
+                'Melihat Pemandangan Gunung',
+                'Menikmati Teh Pagi',
+                'Sungai yang Tenang',
+                'Matahari Pagi yang Hangat',
+                'Menghirup Udara Segar',
+                'Bermain dengan Anjing',
+                'Bermain Bola di Taman',
+                'Anak-anak Bermain di Pantai',
+                'Bersantai di Tepi Kolam',
+                'Angin Malam yang Sejuk',
+                'Pemandangan Kota dari Jauh',
+                'Keindahan Alam di Pedesaan',
+                'Menikmati Kopi di Pagi Hari',
+                'Pasar yang Penuh Warna',
+                'Berjalan di Hutan',
+                'Menatap Awan di Langit',
+                'Menikmati Makanan Khas Daerah',
+                'Bermain Layang-Layang',
+                'Menonton Film Favorit',
+                'Bercanda Bersama Teman',
+                'Menyusuri Jalan Berkelok',
+                'Berjemur di Pantai',
+                'Pemandangan Alam yang Hijau',
+                'Langit Penuh Awan Putih',
+                'Mendengarkan Musik Tenang',
+                'Berjalan di Pedesaan',
+                'Hawa Dingin Pagi Hari',
+                'Kehangatan Api Unggun',
+                'Pemandangan Laut yang Indah',
+                'Taman Bunga yang Rapi',
+                'Bermain di Salju',
+                'Menyelam di Lautan',
+                'Berjalan di Jembatan Kayu',
+                'Bermain dengan Anak Kecil',
+                'Mengamati Matahari Terbenam',
+                'Menikmati Waktu Sendiri'
+            ];
+
+            let randomEmoji = emojiList[Math.floor(Math.random() * emojiList.length)];
+            let randomPlayer = user
+
+            reply(`${randomPlayer}, kamu yang harus mengekspresikan arti berikut: ${randomEmoji}\nEkspresikan arti ini melalui teks atau emoji lain! Pemain lain akan menebaknya.`);
+            isGuessing = true;
+            let correctAnswer = randomEmoji.toLowerCase();
+            let guessed = false;
+            function handleGuess(users, guess) {
+                if (!guessed) {
+                    if (guess.toLowerCase() === correctAnswer) {
+                        guessed = true;
+                        isGuessing = false;
+                        reply(`Tebakan benar, ${users}! Jawaban yang benar adalah: ${correctAnswer}`);
+                    } else {
+                        reply(`Tebakan salah, ${users}. Coba lagi!`);
+                    }
+                }
+            }
+
+            // Fungsi untuk menangani ekspresi dari pemain
+            // Kamu bisa menggunakan event listener atau sm() untuk menerima input dari pemain
+            // Misalnya, kita mendengarkan jawaban dari pemain lain
+            // Misalnya: handleGuess(user, guess)
+
+            setTimeout(() => {
+                if (!guessed) {
+                    reply(`Waktu habis! Jawaban yang benar adalah: ${correctAnswer}`);
+                }
+            }, 30000);  // Waktu habis setelah 30 detik
+
+            break;
 
         default:
-            if (!apiKey) {
-                reply('Command Tidak Ditemukan');
-            } else {
-                const ai = await chatAi(user, msg);
-                console.log(`AI: ${ai}`);
-                if (ai.action && ai.message) {
-                    const movementPattern = /^(up|down|left|right) \(\d+\)$/;
-                    if (movementPattern.test(ai.action)) {
-                        command(botName, `.${ai.action}`, 'whisper');
-                    } else {
-                        sm(ai.action);
+            if (isMakingStory) {
+                handleWhisper(user, msg);
+            } else if (isGuessing) {
+                handleGuess(user, msg)
+            }
+            else{
+                if (!apiKey) {
+                    reply('Command Tidak Ditemukan');
+                } else {
+                    const ai = await chatAi(user, msg);
+                    console.log(`AI: ${ai}`);
+                    if (ai.action && ai.message) {
+                        const movementPattern = /^(up|down|left|right) \(\d+\)$/;
+                        if (movementPattern.test(ai.action)) {
+                            command(botName, `.${ai.action}`, 'whisper');
+                        } else {
+                            sm(ai.action);
+                        }
+                        reply(ai.message);
                     }
-                    reply(ai.message);
+                    break;
                 }
-                break;
             }
     }
 }
