@@ -1250,7 +1250,7 @@ let tempHistory = {};
       } else {
         console.log("❌ Play button not found...");
       }
-    }, 5000);
+    }, 3000);
     window.autoClickerRunning = true;
     alert("✅ Auto-click ENABLED! It will click Play every 5 seconds.");
     antiAfk = true;
