@@ -684,7 +684,7 @@ async function command(user, msg, mtype) {
         case 'up':
         case 'right':
         case 'down':
-            if (user != owner || user != botName) {
+            if (user != owner && user != botName) {
                 reply(`Hanya ${owner || 'Owner'} yang bisa menggunakan perintah ini.`);
                 break;
             }
