@@ -244,6 +244,7 @@ async function fetchAndLogUsername() {
         owner = botset.owner
         prefix = botset.prefix
         chatTp = botset.chatTp
+        antiAfk = botset.antiAfk
         if (botset.apiKey){apiKey = botset.apiKey}
 
     }
@@ -1056,7 +1057,7 @@ function settingMenu() {
         alertSave.textContent = "Perubahan berhasil disimpan";
         alertSave.style.color = "green";
         sm('/think Perubahan Disimpan')
-        Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk=antiAfk apiKey: apiKey})); 
+        Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk=antiAfk, apiKey: apiKey})); 
         setTimeout(() => {
             document.getElementById('alert-save').textContent = ''
         }, 2000);
