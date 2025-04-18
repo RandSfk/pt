@@ -706,7 +706,7 @@ async function command(user, msg, mtype) {
                 }
             }
             break;
-        case 'tebak_emoji_multiplayer':
+        case 'tebak_emoji':
             let emojiList = [
                 'Hari yang Cerah',
                 'Pohon yang Tinggi',
@@ -1035,7 +1035,7 @@ function settingMenu() {
         alertSave.textContent = "Perubahan berhasil disimpan";
         alertSave.style.color = "green";
         sm('/think Perubahan Disimpan')
-        Android.saveSettings(JSON.stringify({ owner: owner, botName: botName, prefix: prefix, chatTp: chatTp, apiKey: apiKey})); 
+        Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, apiKey: apiKey})); 
         setTimeout(() => {
             document.getElementById('alert-save').textContent = ''
         }, 2000);
