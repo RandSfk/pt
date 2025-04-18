@@ -823,12 +823,6 @@ async function command(user, msg, mtype) {
                     }
                 }
             }
-
-            // Fungsi untuk menangani ekspresi dari pemain
-            // Kamu bisa menggunakan event listener atau sm() untuk menerima input dari pemain
-            // Misalnya, kita mendengarkan jawaban dari pemain lain
-            // Misalnya: handleGuess(user, guess)
-
             setTimeout(() => {
                 if (!guessed) {
                     reply(`Waktu habis! Jawaban yang benar adalah: ${correctAnswer}`);
@@ -1139,11 +1133,10 @@ function showErrorMessage(message) {
 }
 
 function showMessage(message) {
-    // Cek jika pesan sudah ada di halaman
     var existingMessages = document.querySelectorAll('.custom-message');
     for (var i = 0; i < existingMessages.length; i++) {
         if (existingMessages[i].textContent === message) {
-            return; // Jika pesan sudah ada, tidak menambahkannya lagi
+            return;
         }
     }
 
