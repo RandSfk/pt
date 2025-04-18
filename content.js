@@ -428,16 +428,16 @@ async function command(user, msg, mtype) {
             messages.forEach((msg, index) => {
                 setTimeout(() => {
                     if (mtype === 'whisper') {
-                        sm(`/whisper ${user} ${msg}`, reply);
+                        sm(msg, 'whisper', user);
                     } else {
                         if (chatTp === 'think') {
-                            sm(`/think ${msg}`, reply);
+                            sm(msg, 'think', user);
                         } else if (chatTp === 'normal') {
-                            sm(`/say ${msg}`, reply);
+                            sm(msg, 'say', user);
                         } else if (chatTp === 'auto') {
-                            sm(`/${mtype} ${msg}`, reply);
+                            sm(msg, mtype, user);
                         } else {
-                            sm(`/say ${msg}`, reply);
+                            sm(msg, 'say', user);
                         }
                     }
                 }, delay);
