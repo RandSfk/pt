@@ -1235,3 +1235,24 @@ function updateBotHistory() {
 }
 let tempHistory = {};
 
+(function () {
+  if (antiAfk) {
+    clearInterval(window.autoClicker);
+    window.autoClickerRunning = false;
+    alert("⛔ Auto-click DISABLED!");
+    antiAfk = false;
+  } else {
+    window.autoClicker = setInterval(() => {
+      const playButton = document.querySelector('.btn.btn-lg.btn-success');
+      if (playButton) {
+        playButton.click();
+        console.log("✅ Clicked Play!");
+      } else {
+        console.log("❌ Play button not found...");
+      }
+    }, 5000);
+    window.autoClickerRunning = true;
+    alert("✅ Auto-click ENABLED! It will click Play every 5 seconds.");
+    antiAfk = true;
+  }
+})();
