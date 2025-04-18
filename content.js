@@ -1046,6 +1046,7 @@ function settingMenu() {
         chatTp = chatTypeValue;
         antiAfk = antiAfkValue;
         apiKey = apikeyValue;
+        window.alert(antiAfk);
 
 
         if (botName === botValue) {
@@ -1054,7 +1055,7 @@ function settingMenu() {
             updateUsername(botValue);
         }
         const alertSave = document.getElementById('alert-save');
-        alertSave.textContent = antiAfk;
+        alertSave.textContent = "Successfully Changed";
         alertSave.style.color = "green";
         sm('/think Perubahan Disimpan')
         Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk: antiAfk, apiKey: apiKey})); 
