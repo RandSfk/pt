@@ -860,8 +860,7 @@ async function command(user, msg, mtype) {
                     break;
                 }
             }
-    }
-}
+        }
 
 
 fetchAndLogUsername();
