@@ -1234,24 +1234,4 @@ function updateBotHistory() {
     }
 }
 let tempHistory = {};
-function antigfk() {
-    if (antiAfk) {
-        clearInterval(window.antiAfk);
-        alert("⛔ Anti-AFK DIMATIKAN!");
-        console.log("⛔ Anti-AFK sudah dimatikan.");
-    } else {
-        window.antiAfk = setInterval(() => {
-            let tombol = document.querySelector('.btn.btn-lg.btn-success');
-            if (tombol) {
-                tombol.click();
-                console.log("✅ Tombol 'Play' diklik untuk tetap aktif!");
-            } else {
-                console.log("❌ Tombol 'Play' tidak ditemukan...");
-            }
-        }, 5000);
-        
-        alert("✅ Anti-AFK DIAKTIFKAN! Akan klik tombol 'Play' setiap 5 detik.");
-        console.log("✅ Anti-AFK sudah diaktifkan.");
-    }
-}
-antigfk()
+
