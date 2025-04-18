@@ -436,7 +436,7 @@ async function command(user, msg, mtype) {
                 else if (chatTp === 'auto') type = mtype;
                 sm(msg, type, user);
             }, delay);
-            delay += 1500;
+            delay += 7000;
         });
         setTimeout(() => {
             sm('/clearchat');
