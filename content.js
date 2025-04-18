@@ -3,7 +3,7 @@ let botName = "";
 let prefix = ['.', '!'];
 let chatTp = "auto";
 let owner = "";
-let antiAfk = false
+let antiAfk = 
 //========================
 
 let lastBotName = "";
@@ -910,8 +910,8 @@ function settingMenu() {
     <div class="text-success py-1" style="display: flex; align-items: center;">
         <label for="chatTypeSelect" style="width: 200px;">Anti Afk</label>
         <select class="form-control" id="antiAfkInput" name="antiAfk" style="width: 200px; height: 30px;" required>
-            <option value=true>On</option>
-            <option value=false>Off</option>
+            <option value="true">On</option>
+            <option value="false">Off</option>
             
         </select>
     </div>
@@ -1035,7 +1035,7 @@ function settingMenu() {
         const apikeyValue = apikeyInput.value;
         const ownerValue = ownerInput.value;
         const botValue = botInput.value;
-        const antiAfkValue = antiAfkInput.value;
+        const antiAfkValue = antiAfkInput.value === "true";
         const prefixValue = prefixInput.value;
         if (!ownerValue || !botValue || !prefixValue || !chatTypeValue) {
             alert('Tolong lengkapi semua data');
