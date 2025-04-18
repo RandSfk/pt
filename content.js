@@ -239,6 +239,15 @@ async function fetchAndLogUsername() {
     console.log(username);
     botName = username;
     clickCloseButton();
+    if (typeof Android !== "undefined" && Android.loadSettings) {
+        const botset = JSON.parse(Android.loadSettings());
+        owner = botset.owner
+        prefix = botset.prefix
+        apiKey = botset.apiKey
+        chatTp = botset.chatTp
+
+    }
+    
 }
 
 function sm(msg, mtype = "", user = "") {
