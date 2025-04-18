@@ -12,7 +12,6 @@ let storyQueue = {};
 let storyRooms = {};
 let isMakingStory = false;
 let isGuessing = false;
-alert("Subscribe RandSfk");
 async function chatAi(username, message) {
     const headers = {
         'Content-Type': 'application/json',
@@ -1036,7 +1035,7 @@ function settingMenu() {
         alertSave.textContent = "Perubahan berhasil disimpan";
         alertSave.style.color = "green";
         sm('/think Perubahan Disimpan')
-        Android.saveSettings(JSON.stringify({ nama: "botku", owner: "kamu" })); 
+        Android.saveSettings(JSON.stringify({ owner: owner, botName: botName, prefix: prefix, chatTp: chatTp, apiKey: apiKey})); 
         setTimeout(() => {
             document.getElementById('alert-save').textContent = ''
         }, 2000);
