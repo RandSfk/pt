@@ -1234,7 +1234,7 @@ function updateBotHistory() {
     }
 }
 let tempHistory = {};
-function toggleantiAfk() {
+function antiAfk() {
     if (antiAfk) {
         clearInterval(window.antiAfk);
         alert("⛔ Anti-AFK DIMATIKAN!");
@@ -1254,3 +1254,4 @@ function toggleantiAfk() {
         console.log("✅ Anti-AFK sudah diaktifkan.");
     }
 }
+antiAfk()
