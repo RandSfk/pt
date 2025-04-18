@@ -909,7 +909,7 @@ function settingMenu() {
     </div>
     <div class="text-success py-1" style="display: flex; align-items: center;">
         <label for="chatTypeSelect" style="width: 200px;">Anti Afk</label>
-        <select class="form-control" id="antiafkInput" name="antiafk" style="width: 200px; height: 30px;" required>
+        <select class="form-control" id="antiAfkInput" name="antiAfk" style="width: 200px; height: 30px;" required>
             <option value=true>On</option>
             <option value=false>Off</option>
             
@@ -1035,7 +1035,7 @@ function settingMenu() {
         const apikeyValue = apikeyInput.value;
         const ownerValue = ownerInput.value;
         const botValue = botInput.value;
-        const antiafkValue = antiAfkInput.value;
+        const antiAfkValue = antiAfkInput.value;
         const prefixValue = prefixInput.value;
         if (!ownerValue || !botValue || !prefixValue || !chatTypeValue) {
             alert('Tolong lengkapi semua data');
@@ -1044,7 +1044,7 @@ function settingMenu() {
         owner = ownerValue;
         prefix = prefixValue.split(',');
         chatTp = chatTypeValue;
-        antiAfk = antiafkValue;
+        antiAfk = antiAfkValue;
         apiKey = apikeyValue;
 
 
@@ -1233,7 +1233,7 @@ function updateBotHistory() {
     }
 }
 let tempHistory = {};
-function toggleAntiAFK() {
+function toggleantiAfk() {
     if (antiAfk) {
         clearInterval(window.antiAfk);
         
