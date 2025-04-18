@@ -3,7 +3,7 @@ let botName = "";
 let prefix = ['.', '!'];
 let chatTp = "auto";
 let owner = "";
-let antiAfk = 
+let antiAfk = null
 //========================
 
 let lastBotName = "";
