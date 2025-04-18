@@ -243,8 +243,8 @@ async function fetchAndLogUsername() {
         const botset = JSON.parse(Android.loadSettings());
         owner = botset.owner
         prefix = botset.prefix
-        apiKey = botset.apiKey
         chatTp = botset.chatTp
+        if (botset.apiKey){apiKey = botset.apiKey}
 
     }
     
