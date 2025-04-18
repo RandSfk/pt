@@ -1046,6 +1046,7 @@ function settingMenu() {
         chatTp = chatTypeValue;
         antiAfk = antiAfkValue;
         apiKey = apikeyValue;
+        alert('antiAfk');
 
 
         if (botName === botValue) {
@@ -1234,7 +1235,7 @@ function updateBotHistory() {
 }
 let tempHistory = {};
 function toggleantiAfk() {
-    if (!antiAfk) {
+    if (antiAfk) {
         clearInterval(window.antiAfk);
         alert("⛔ Anti-AFK DIMATIKAN!");
         console.log("⛔ Anti-AFK sudah dimatikan.");
