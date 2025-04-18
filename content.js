@@ -4,6 +4,7 @@ let prefix = ['.', '!'];
 let chatTp = "auto";
 let owner = "";
 let antiAfk = false
+let ai = true
 //========================
 
 let lastBotName = "";
@@ -843,19 +844,24 @@ async function command(user, msg, mtype) {
                 handleGuess(user, msg)
             }
             else{
-                if (!apiKey) {
-                    reply('Command Tidak Ditemukan');
-                } else {
-                    const ai = await chatAi(user, msg);
-                    console.log(`AI: ${ai}`);
-                    if (ai.action && ai.message) {
-                        const movementPattern = /^(up|down|left|right) \(\d+\)$/;
-                        if (movementPattern.test(ai.action)) {
-                            command(botName, `.${ai.action}`, 'whisper');
-                        } else {
-                            sm(ai.action);
+                if (apiKey && ai) {
+                    try {
+                        const ai = await chatAi(user, msg);
+                        if (ai.action && ai.message) {
+                            const movementPattern = /^(up|down|left|right) \(\d+\)$/;
+                            if (movementPattern.test(ai.action)) {
+                                command(botName, `.${ai.action}`, 'whisper');
+                            } else {
+                                sm(ai.action);
+                            }
+                            reply(ai.message);
                         }
-                        reply(ai.message);
+                    } catch (err) {
+                        reply('Respon Dari Transformers null, AI return error');
+                    }
+
+                } else {
+                    reply('Command Tidak Ditemukan');
                     }
                     break;
                 }
