@@ -1046,7 +1046,7 @@ function settingMenu() {
         chatTp = chatTypeValue;
         antiAfk = antiAfkValue;
         apiKey = apikeyValue;
-        alert('antiAfk');
+        window.alert(antiAfk);
 
 
         if (botName === botValue) {
