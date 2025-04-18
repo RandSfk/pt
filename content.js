@@ -1226,7 +1226,7 @@ function updateBotHistory() {
             { role: "user", parts: [{ text: JSON.stringify({ username: "emily", message: "hallo" }) }] },
             { role: "model", parts: [{ text: JSON.stringify({ action: "/reset", message: "brisik lon*te" }) }] },
             { role: "user", parts: [{ text: JSON.stringify({ username: "lilia", message: `hai ${botName}` }) }] },
-            { role: "model", parts: [{ text: JSON.stringify({ action: "/reset", message: "Bacot amat lon t" }) }] },
+            { role: "model", parts: [{ text: JSON.stringify({ action: "/reset", message: "Bacot amat lonte" }) }] },
             { role: "user", parts: [{ text: JSON.stringify({ username: "RandSfk", message: botName }) }] },
             { role: "model", parts: [{ text: JSON.stringify({ action: "/yes", message: "iya sayang, eh tuan, ada apa? mau thre3som3 kah? OwO" }) }] }
         ];
@@ -1234,9 +1234,8 @@ function updateBotHistory() {
 }
 let tempHistory = {};
 function toggleantiAfk() {
-    if (antiAfk) {
+    if (!antiAfk) {
         clearInterval(window.antiAfk);
-        
         alert("⛔ Anti-AFK DIMATIKAN!");
         console.log("⛔ Anti-AFK sudah dimatikan.");
     } else {
