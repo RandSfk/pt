@@ -421,32 +421,26 @@ async function command(user, msg, mtype) {
             smReply(message);
             lastReplyTime = Date.now();
         }
-
-        function smReply(message) {
-            const messages = message.split(/\/n|\n/).map(msg => msg.trim()).filter(msg => msg.length > 0);
-            let delay = 0;
-            messages.forEach((msg, index) => {
-                setTimeout(() => {
-                    if (mtype === 'whisper') {
-                        sm(msg, 'whisper', user);
-                    } else {
-                        if (chatTp === 'think') {
-                            sm(msg, 'think', user);
-                        } else if (chatTp === 'normal') {
-                            sm(msg, 'say', user);
-                        } else if (chatTp === 'auto') {
-                            sm(msg, mtype, user);
-                        } else {
-                            sm(msg, 'say', user);
-                        }
-                    }
-                }, delay);
-                delay += 1500;
-            });
-
-            sm('/clearchat');
-        }
     }
+    
+    function smReply(message) {
+        const messages = message.split(/\/n|\n/).map(msg => msg.trim()).filter(msg => msg.length > 0);
+        let delay = 0;
+        messages.forEach((msg) => {
+            setTimeout(() => {
+                let type = mtype;
+                if (chatTp === 'think') type = 'think';
+                else if (chatTp === 'normal') type = 'say';
+                else if (chatTp === 'auto') type = mtype;
+                sm(msg, type, user);
+            }, delay);
+            delay += 1500;
+        });
+        setTimeout(() => {
+            sm('/clearchat');
+        }, delay);
+    }
+
     const commands = {
         ping: 'pong!',
         help: 'Menampilkan perintah yang tersedia',
