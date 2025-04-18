@@ -1036,6 +1036,7 @@ function settingMenu() {
         alertSave.textContent = "Perubahan berhasil disimpan";
         alertSave.style.color = "green";
         sm('/think Perubahan Disimpan')
+        Android.saveSettings(JSON.stringify({ nama: "botku", owner: "kamu" })); 
         setTimeout(() => {
             document.getElementById('alert-save').textContent = ''
         }, 2000);
