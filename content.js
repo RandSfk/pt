@@ -12,7 +12,7 @@ let storyQueue = {};
 let storyRooms = {};
 let isMakingStory = false;
 let isGuessing = false;
-
+alert("Subscribe RandSfk");
 async function chatAi(username, message) {
     const headers = {
         'Content-Type': 'application/json',
