@@ -3,7 +3,7 @@ let botName = "";
 let prefix = ['.', '!'];
 let chatTp = "auto";
 let owner = "";
-
+let antiAfk = false
 //========================
 
 let lastBotName = "";
@@ -906,6 +906,14 @@ function settingMenu() {
             <option value="think">Think</option>
         </select>
     </div>
+    <div class="text-success py-1" style="display: flex; align-items: center;">
+        <label for="chatTypeSelect" style="width: 200px;">Anti Afk</label>
+        <select class="form-control" id="antiafkInput" name="antiafk" style="width: 200px; height: 30px;" required>
+            <option value=true>On</option>
+            <option value=false>Off</option>
+            
+        </select>
+    </div>
 
         <div class="text-success py-1" style="display: flex; align-items: center;">
         <label for="prefixInput" style="width: 200px;">Apikey</label>
@@ -1019,12 +1027,14 @@ function settingMenu() {
         const botInput = document.getElementById('botInput');
         const prefixInput = document.getElementById('prefixInput');
         const chatTypeSelect = document.getElementById('chatTypeSelect');
+        const antiAfkInput = document.getElementById('antiAfkInput');
         const apikeyInput = document.getElementById('apikeyInput');
 
         const chatTypeValue = chatTypeSelect.value;
         const apikeyValue = apikeyInput.value;
         const ownerValue = ownerInput.value;
         const botValue = botInput.value;
+        const antiafkValue = antiAfkInput.value;
         const prefixValue = prefixInput.value;
         if (!ownerValue || !botValue || !prefixValue || !chatTypeValue) {
             alert('Tolong lengkapi semua data');
@@ -1033,7 +1043,9 @@ function settingMenu() {
         owner = ownerValue;
         prefix = prefixValue.split(',');
         chatTp = chatTypeValue;
+        antiAfk = antiafkValue;
         apiKey = apikeyValue;
+
 
         if (botName === botValue) {
         } else {
@@ -1044,7 +1056,7 @@ function settingMenu() {
         alertSave.textContent = "Perubahan berhasil disimpan";
         alertSave.style.color = "green";
         sm('/think Perubahan Disimpan')
-        Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, apiKey: apiKey})); 
+        Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk=antiAfk apiKey: apiKey})); 
         setTimeout(() => {
             document.getElementById('alert-save').textContent = ''
         }, 2000);
@@ -1220,3 +1232,24 @@ function updateBotHistory() {
     }
 }
 let tempHistory = {};
+function toggleAntiAFK() {
+    if (antiAfk) {
+        clearInterval(window.antiAfk);
+        
+        alert("⛔ Anti-AFK DIMATIKAN!");
+        console.log("⛔ Anti-AFK sudah dimatikan.");
+    } else {
+        window.antiAfk = setInterval(() => {
+            let tombol = document.querySelector('.btn.btn-lg.btn-success');
+            if (tombol) {
+                tombol.click();
+                console.log("✅ Tombol 'Play' diklik untuk tetap aktif!");
+            } else {
+                console.log("❌ Tombol 'Play' tidak ditemukan...");
+            }
+        }, 5000);
+        
+        alert("✅ Anti-AFK DIAKTIFKAN! Akan klik tombol 'Play' setiap 5 detik.");
+        console.log("✅ Anti-AFK sudah diaktifkan.");
+    }
+}
