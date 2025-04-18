@@ -246,6 +246,7 @@ async function fetchAndLogUsername() {
         prefix = botset.prefix
         chatTp = botset.chatTp
         antiAfk = botset.antiAfk
+        ai = botset.ai
         if (botset.apiKey){apiKey = botset.apiKey}
 
     }
@@ -905,7 +906,13 @@ function settingMenu() {
         <select class="form-control" id="antiAfkInput" name="antiAfk" style="width: 200px; height: 30px;" required>
             <option value="true">On</option>
             <option value="false">Off</option>
-            
+        </select>
+    </div>
+    <div class="text-success py-1" style="display: flex; align-items: center;">
+        <label for="chatTypeSelect" style="width: 200px;">AI Chat</label>
+        <select class="form-control" id="aichatInput" name="aichat" style="width: 200px; height: 30px;" required>
+            <option value="true">On</option>
+            <option value="false">Off</option>
         </select>
     </div>
 
@@ -1022,6 +1029,7 @@ function settingMenu() {
         const prefixInput = document.getElementById('prefixInput');
         const chatTypeSelect = document.getElementById('chatTypeSelect');
         const antiAfkInput = document.getElementById('antiAfkInput');
+        const aichatInput = document.getElementById('aichatInput');
         const apikeyInput = document.getElementById('apikeyInput');
 
         const chatTypeValue = chatTypeSelect.value;
@@ -1029,6 +1037,7 @@ function settingMenu() {
         const ownerValue = ownerInput.value;
         const botValue = botInput.value;
         const antiAfkValue = antiAfkInput.value === "true";
+        const aichatValue = aichatInput.value === "true";
         const prefixValue = prefixInput.value;
         if (!ownerValue || !botValue || !prefixValue || !chatTypeValue) {
             alert('Tolong lengkapi semua data');
@@ -1038,6 +1047,7 @@ function settingMenu() {
         prefix = prefixValue.split(',');
         chatTp = chatTypeValue;
         antiAfk = antiAfkValue;
+        ai = aichatValue;
         apiKey = apikeyValue;
         window.alert(antiAfk);
 
@@ -1051,7 +1061,7 @@ function settingMenu() {
         alertSave.textContent = "Successfully Changed";
         alertSave.style.color = "green";
         sm('/think Perubahan Disimpan')
-        Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk: antiAfk, apiKey: apiKey})); 
+        Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk: antiAfk, ai: ai, apiKey: apiKey})); 
         setTimeout(() => {
             document.getElementById('alert-save').textContent = ''
         }, 2000);
