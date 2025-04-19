@@ -12,7 +12,7 @@ let isIdle = false;
 const idleDelay = [60000, 90000, 120000][Math.floor(Math.random() * 3)];
 
 function getRandomIdleDelay() {
-    const options = [60000, 90000, 120000, 70000, 40000];
+    const options = [60000, 90000, 120000, 70000, 240000, 160000];
     return options[Math.floor(Math.random() * options.length)];
 }
 
@@ -385,7 +385,7 @@ async function triggerIdle() {
         `Aku diem karena kamu diem. Tapi batinku berisik.`
     ];
 
-    const idleAction = ["sit", "lay", "fly", "boop", "stand"];
+    const idleAction = ["sit", "lay", "boop", "stand"];
 
     if (ai) {
         const randomMessage = await chatAi("system", "Bot Requests Random IDLE");
@@ -401,7 +401,7 @@ async function triggerIdle() {
     } else {
         const msg = idleMessages[Math.floor(Math.random() * idleMessages.length)];
         const act = idleAction[Math.floor(Math.random() * idleAction.length)];
-        sm(act);
+        sm(`/${act}`);
         sm(msg, 'think');
     }
 }
