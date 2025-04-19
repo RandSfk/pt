@@ -1151,7 +1151,7 @@ function showErrorMessage(message) {
                 errorElement.parentNode.removeChild(errorElement);
             }
         }, 2000);
-    }
+    } 
 }
 
 function showMessage(message) {
@@ -1189,6 +1189,16 @@ function waitForValues() {
         }
     }, 100);
 }
+const botHistory = { contents: [] };
+      Object.defineProperty(window, "botName", {
+        set(value) {
+          this._botName = value;
+          updateBotHistory();
+        },
+        get() {
+          return this._botName;
+        }
+      });
 
 function watchBotValues() {
     setInterval(() => {
@@ -1280,16 +1290,7 @@ let tempHistory = {};
       watchBotValues();
 
       // Bot History
-      const botHistory = { contents: [] };
-      Object.defineProperty(window, "botName", {
-        set(value) {
-          this._botName = value;
-          updateBotHistory();
-        },
-        get() {
-          return this._botName;
-        }
-      });
+      
 
     }, 3000); // Tunggu 3 detik sebelum melanjutkan
   }
