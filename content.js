@@ -7,7 +7,7 @@ let antiAfk = false;
 let ai = false;
 let isTyping = false;
 let idleTimer;
-const idleDelay = 90000; // 10 detik idle time
+const idleDelay = 9000; // 10 detik idle time
 let isIdle = false;
 //========================
 
