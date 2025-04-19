@@ -5,6 +5,7 @@ let chatTp = "auto";
 let owner = "";
 let antiAfk = false;
 let ai = true;
+let isTyping = false
 //========================
 
 let lastBotName = "";
@@ -318,6 +319,7 @@ async function command(user, msg, mtype) {
     if (!user || !msg || !mtype) return;
     console.log(`${user}: ${msg}`);
     if (!prefix.some(p => msg.startsWith(p))) return;
+    if (isTyping) return;
     let args = msg.split(' ');
     let cmd = args.shift().substring(1);
     let text = args.join(' ');
@@ -411,6 +413,7 @@ async function command(user, msg, mtype) {
 
     }
     function reply(message) {
+        isTyping = true
         const now = Date.now();
         const timeDifference = now - lastReplyTime;
         const minInterval = 1500;
@@ -423,6 +426,7 @@ async function command(user, msg, mtype) {
             smReply(message);
             lastReplyTime = Date.now();
         }
+        isTyping = false
     }
     
     function smReply(message) {
