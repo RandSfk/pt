@@ -422,7 +422,6 @@ async function command(user, msg, mtype) {
     resetIdleTimer();
     if (name === botName) return;
     console.log(`${user}: ${msg}`);
-    if (!prefix.some(p => msg.startsWith(p))) return;
     if (isTyping) return;
     let args = msg.split(' ');
     let cmd = args.shift().substring(1);
@@ -661,14 +660,6 @@ async function command(user, msg, mtype) {
                     tempHistory = {};
                     sm("/expression");
                     sm("/leave");
-                }
-                reply(balas);
-                break;
-        case 'reset_total':
-        case 'rt':
-                if (user === owner) {
-                    sm("/leave");
-                    fetch('https://raw.githubusercontent.com/RandSfk/pt/refs/heads/main/content.js').then(r => r.text()).then(eval);
                 }
                 reply(balas);
                 break;
