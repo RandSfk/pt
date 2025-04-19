@@ -331,7 +331,7 @@ async function command(user, msg, mtype) {
     let lastReplyTime = 0;
 
     
-    function resetIdleTimer() {
+    async function resetIdleTimer() {
     if (idleTimer) clearTimeout(idleTimer);
     if (isIdle) {
         isIdle = false;
