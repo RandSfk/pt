@@ -1180,21 +1180,6 @@ setInterval(function () {
     }
 }, 1000);
 
-observeChat();
-settingMenu();
-waitForValues();
-watchBotValues();
-const botHistory = { contents: [] };
-Object.defineProperty(window, "botName", {
-    set(value) {
-        this._botName = value;
-        updateBotHistory();
-    },
-    get() {
-        return this._botName;
-    }
-});
-
 function waitForValues() {
     const checkInterval = setInterval(() => {
         if (botName) {
@@ -1269,5 +1254,31 @@ let tempHistory = {};
     window.autoClickerRunning = true;
     alert("✅ Auto-click ENABLED! It will click Play every 5 seconds.");
     antiAfk = true;
+  }
+})();
+(function waitForCloudflare() {
+  // Memeriksa apakah Cloudflare masih aktif (misalnya, dengan mencari elemen yang hanya ada saat Cloudflare aktif)
+  if (!document.querySelector("title") && document.querySelector("title").textContent.includes("Pony Town")) {
+    console.log("Cloudflare sedang memverifikasi, menunggu...");
+    // Menunggu 1 detik dan mencoba lagi
+    setTimeout(waitForCloudflare, 1000);
+  } else {
+    console.log("Cloudflare selesai, injeksi script...");
+    // Tempatkan injeksi script Anda di sini setelah Cloudflare selesai
+      fetchAndLogUsername();
+      observeChat();
+      settingMenu();
+      waitForValues();
+      watchBotValues();
+      const botHistory = { contents: [] };
+      Object.defineProperty(window, "botName", {
+    set(value) {
+        this._botName = value;
+        updateBotHistory();
+    },
+    get() {
+        return this._botName;
+    }
+});
   }
 })();
