@@ -4,7 +4,7 @@ let prefix = ['.', '!'];
 let chatTp = "auto";
 let owner = "";
 let antiAfk = false;
-let ai = true;
+let ai = false;
 let isTyping = false;
 let idleTimer;
 const idleDelay = 90000; // 10 detik idle time
@@ -381,8 +381,30 @@ async function command(user, msg, mtype) {
                 `Kalau gak mau ngobrol, tinggal bilang aja. Jangan bikin berharap.`,
                 `Aku diem karena kamu diem. Tapi batinku berisik.`
             ];
-            const randomMessage = idleMessages[Math.floor(Math.random() * idleMessages.length)];
-            sm(randomMessage, 'think');
+           const idleAction = [
+               "sit","lay","fly","boop", "stand"
+           ]
+
+            if (ai){
+                const randomMessage = await chatAi("system", "Bot Requests Random IDLE");
+                if (randomMessage.action && randomMessage.message) {
+                            const movementPattern = /^(up|down|left|right) \(\d+\)$/;
+                            if (movementPattern.test(randomMessage.action)) {
+                                command(botName, `${prefix[0]}${randomMessage.action}`, 'whisper');
+                            } else {
+                                sm(randomMessage.action);
+                            }
+                            sm(randomMessage.message, 'think');
+                }
+
+            } else {
+                const randomMessage = idleMessages[Math.floor(Math.random() * idleMessages.length)];
+                const randomAction= idleAction[Math.floor(Math.random() * idleAction.length)];
+                sm(randomAction);
+                sm(randomMessage, 'think');
+            
+            }
+            
         }
     }, idleDelay);
 }
@@ -587,8 +609,11 @@ async function command(user, msg, mtype) {
         case 'turn':
             reply(user === owner ? sm('/turn') : `Hanya ${owner || 'Owner'} yang bisa menggunakan perintah ini.`);
             break;
+        case 'boop':
+            reply(user === owner ? sm('/boop') : `Hanya ${owner || 'Owner'} yang bisa menggunakan perintah ini.`);
+            break;
         case 'reset':
-            if (!apiKey) {
+            if (0===1) {
                 balas = user === owner ? "Anda owner, history telah direset" : "Anda bukan owner, history tidak direset";
                 if (user === owner) {
                     tempHistory = {};
@@ -908,15 +933,15 @@ async function command(user, msg, mtype) {
             else{
                 if (apiKey && ai) {
                     try {
-                        const ai = await chatAi(user, msg);
-                        if (ai.action && ai.message) {
+                        const aires = await chatAi(user, msg);
+                        if (aires.action && aires.message) {
                             const movementPattern = /^(up|down|left|right) \(\d+\)$/;
-                            if (movementPattern.test(ai.action)) {
-                                command(botName, `.${ai.action}`, 'whisper');
+                            if (movementPattern.test(aires.action)) {
+                                command(botName, `${prefix[0]}${aires.action}`, 'whisper');
                             } else {
-                                sm(ai.action);
+                                sm(aires.action);
                             }
-                            reply(ai.message);
+                            reply(aires.message);
                         }
                     } catch (err) {
                         reply('Respon Dari Transformers null, AI return error');
@@ -1299,8 +1324,8 @@ function updateBotHistory() {
             { role: "model", parts: [{ text: JSON.stringify({ action: "/laugh", message: "Siaptuan" }) }] },
             { role: "user", parts: [{ text: JSON.stringify({ username: "RandSfk", message: `oh iya ${botName}, lu kmaren sama sony kan?` }) }] },
             { role: "model", parts: [{ text: JSON.stringify({ action: "/yes", message: "Iyatuan. mulai sekarang saya akan keras dan menggunakan Elu Gw selain sama Tuan wkwk" }) }] },
-            { role: "user", parts: [{ text: JSON.stringify({ username: "idnar", message: `oy ${botName}` }) }] },
-            { role: "model", parts: [{ text: JSON.stringify({ action: "/reset", message: "So asik ngen*ot" }) }] },
+            { role: "user", parts: [{ text: "Requests Random IDLE" }] },
+            { role: "model", parts: [{ text: JSON.stringify({ action: "/sad", message: "Ternyata tidak semua orang bisa menerima kenyataan pahit dalam kehidupan" }) }] },
             { role: "user", parts: [{ text: JSON.stringify({ username: "emily", message: "hallo" }) }] },
             { role: "model", parts: [{ text: JSON.stringify({ action: "/reset", message: "brisik lon*te" }) }] },
             { role: "user", parts: [{ text: JSON.stringify({ username: "lilia", message: `hai ${botName}` }) }] },
