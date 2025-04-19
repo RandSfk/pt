@@ -333,7 +333,7 @@ async function command(user, msg, mtype) {
     async function resetIdleTimer() {
     if (idleTimer) clearTimeout(idleTimer);
     if (isIdle) {
-        resetIdleTimer();
+        
         isIdle = false;
         console.log("Aktif lagi");
     }
