@@ -338,7 +338,7 @@ async function command(user, msg, mtype) {
         console.log("Aktif lagi");
     }
 
-    idleTimer = setTimeout(() => {
+    idleTimer = setTimeout(async () => {
         if (!isIdle) {
             isIdle = true;
             const name = botName.split('|')[0].trim();
