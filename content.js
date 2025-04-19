@@ -1236,54 +1236,61 @@ function updateBotHistory() {
 let tempHistory = {};
 
 (function waitForCloudflare() {
-  // Memeriksa apakah Cloudflare sudah selesai dengan melihat apakah <title> ada dan mengandung "Pony Town"
+  // Memeriksa apakah <title> mengandung "Pony Town" (mengindikasikan halaman siap)
   if (document.querySelector("title") && !document.querySelector("title").textContent.includes("Pony Town")) {
     console.log("Cloudflare sedang memverifikasi, menunggu...");
-    setTimeout(waitForCloudflare, 1000);  // Menunggu 1 detik dan mencoba lagi
+    // Tunggu 1 detik, lalu cek lagi
+    setTimeout(waitForCloudflare, 1000);
   } else {
-    console.log("Cloudflare selesai, injeksi script...");
+    console.log("Cloudflare selesai, menunggu 3 detik sebelum melanjutkan...");
 
-    // Fungsi auto-clicker
-    let antiAfk = false;
-    (function toggleAutoClicker() {
-      if (antiAfk) {
-        clearInterval(window.autoClicker);
-        window.autoClickerRunning = false;
-        alert("⛔ Auto-click DISABLED!");
-        antiAfk = false;
-      } else {
-        window.autoClicker = setInterval(() => {
-          const playButton = document.querySelector('.btn.btn-lg.btn-success');
-          if (playButton) {
-            playButton.click();
-            console.log("✅ Clicked Play!");
-          } else {
-            console.log("❌ Play button not found...");
-          }
-        }, 5000); // 5 detik interval untuk auto-click
-        window.autoClickerRunning = true;
-        alert("✅ Auto-click ENABLED! It will click Play every 5 seconds.");
-        antiAfk = true;
-      }
-    })();
+    // Tunggu 3 detik setelah Cloudflare selesai
+    setTimeout(() => {
+      console.log("3 detik berlalu, injeksi script...");
 
-    // Fungsi-fungsi lainnya
-    fetchAndLogUsername();
-    observeChat();
-    settingMenu();
-    waitForValues();
-    watchBotValues();
+      // Fungsi auto-clicker
+      let antiAfk = false;
+      (function toggleAutoClicker() {
+        if (antiAfk) {
+          clearInterval(window.autoClicker);
+          window.autoClickerRunning = false;
+          alert("⛔ Auto-click DISABLED!");
+          antiAfk = false;
+        } else {
+          window.autoClicker = setInterval(() => {
+            const playButton = document.querySelector('.btn.btn-lg.btn-success');
+            if (playButton) {
+              playButton.click();
+              console.log("✅ Clicked Play!");
+            } else {
+              console.log("❌ Play button not found...");
+            }
+          }, 5000); // 5 detik interval untuk auto-click
+          window.autoClickerRunning = true;
+          alert("✅ Auto-click ENABLED! It will click Play every 5 seconds.");
+          antiAfk = true;
+        }
+      })();
 
-    // Bot History
-    const botHistory = { contents: [] };
-    Object.defineProperty(window, "botName", {
-      set(value) {
-        this._botName = value;
-        updateBotHistory();
-      },
-      get() {
-        return this._botName;
-      }
-    });
+      // Fungsi-fungsi lainnya
+      fetchAndLogUsername();
+      observeChat();
+      settingMenu();
+      waitForValues();
+      watchBotValues();
+
+      // Bot History
+      const botHistory = { contents: [] };
+      Object.defineProperty(window, "botName", {
+        set(value) {
+          this._botName = value;
+          updateBotHistory();
+        },
+        get() {
+          return this._botName;
+        }
+      });
+
+    }, 3000); // Tunggu 3 detik sebelum melanjutkan
   }
 })();
