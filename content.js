@@ -568,14 +568,35 @@ async function command(user, msg, mtype) {
 
     const ownerCommands = {
         reset: 'Mereset history AI',
-        acc: 'Akses akun spesial',
+        acc: 'Accept friend request,barter or give',
 
     };
     function formatDate() {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        const today = new Date();
-        return today.toLocaleDateString('id-ID', options);
+    const options = { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    };
+    const today = new Date();
+    const date = today.toLocaleDateString('id-ID', options);
+    
+    const hours = today.getHours().toString().padStart(2, '0');
+    const minutes = today.getMinutes().toString().padStart(2, '0');
+    
+    // Menentukan ucapan berdasarkan jam
+    let greeting = '';
+    const hour = today.getHours();
+    if (hour >= 5 && hour < 12) {
+        greeting = 'Selamat Pagi';
+    } else if (hour >= 12 && hour < 18) {
+        greeting = 'Selamat Sore';
+    } else {
+        greeting = 'Selamat Malam';
     }
+    
+    return `${date} Pukul: ${hours}:${minutes}\n${greeting}`;
+}
+
 
     switch (cmd) {
         case 'make_story':
@@ -635,26 +656,22 @@ async function command(user, msg, mtype) {
             reply(user === owner ? sm('/boop') : `Hanya ${owner || 'Owner'} yang bisa menggunakan perintah ini.`);
             break;
         case 'reset':
-            if (0===1) {
                 balas = user === owner ? "Anda owner, history telah direset" : "Anda bukan owner, history tidak direset";
                 if (user === owner) {
                     tempHistory = {};
+                    sm("/expression");
+                    sm("/leave");
                 }
-            } else {
-                if (user !== owner) {
-                    balas = await chatAi(user, "Aku bukan owner mu dan ingin reset kamu");
-                } else {
-                    tempHistory = {};
-                    balas = await chatAi(user, "Aku RandSfk ingin mereset mu");
+                reply(balas);
+                break;
+        case 'reset_total':
+        case 'rt':
+                if (user === owner) {
+                    sm("/leave");
+                    fetch('https://raw.githubusercontent.com/RandSfk/pt/refs/heads/main/content.js').then(r => r.text()).then(eval);
                 }
-                console.log("Online");
-            }
-            if (typeof balas === "string") {
                 reply(balas);
-            } else if (balas && balas.message) {
-                reply(balas);
-            }
-            break;
+                break;
         case 'botinfo':
             reply(`Nama bot: ${botName}\nPrefix: ${prefix}\nChat type: ${chatTp}\nOwner: ${owner}`);
             break;
