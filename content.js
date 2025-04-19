@@ -7,8 +7,10 @@ let antiAfk = false;
 let ai = false;
 let isTyping = false;
 let idleTimer;
-const idleDelay = 20000; // 10 detik idle time
+let idleLoopTimer;
 let isIdle = false;
+const idleDelay = 9000; // 9 detik
+
 //========================
 
 let lastBotName = "";
@@ -317,84 +319,96 @@ function sm(msg, mtype = "", user = "") {
     splitAndSend(msg);
 }
 
+
 async function resetIdleTimer() {
     if (idleTimer) clearTimeout(idleTimer);
+    if (idleLoopTimer) clearTimeout(idleLoopTimer);
+
     if (isIdle) {
-        
         isIdle = false;
-        sm("Aktif lagi");
+        console.log("Aktif lagi");
     }
 
     idleTimer = setTimeout(async () => {
-        if (!isIdle) {
-            isIdle = true;
-            const name = botName.split('|')[0].trim();
-            const idleMessages = [
-                `Halo? Masih di sana gak sih?`,
-                `${name} nungguin... kayak gak punya hidup aja.`,
-                `Kamu diem, aku diem. Kita cocok gak sih sebenernya?`,
-                `Lama-lama jadi dingin gini, aku bukan kulkas.`,
-                `Aku sih bisa aja ngomong sendiri, tapi kesannya kasian.`,
-                `${name} mulai mikir, jangan-jangan cuma pelengkap doang.`,
-                `Sepi amat, kayak ruang kosong dalam hati.`,
-                `Ngomong dong, jangan cuma aku yang mikir hubungan ini.`,
-                `Terlalu sunyi... sampai bisa denger suara debu jatuh.`,
-                `${name} ngelamun dulu deh, siapa tau ada yang inget.`,
-                `Kalau diem terus, nanti aku beneran ngilang loh.`,
-                `Nungguin kamu tuh rasanya kayak nungguin bintang jatuh.`,
-                `Apa aku ngelakuin kesalahan? Kok kamu hilang gitu aja.`,
-                `Udah mulai bosen sih, tapi tetep nungguin.`,
-                `${name} bisa aja cabut, tapi ya... masih berharap.`,
-                `Lama-lama aku jadi yang tersakiti di sini.`,
-                `Aku diem, bukan berarti gak ngerasa.`,
-                `Kamu sibuk ya? Gak apa-apa kok... aku udah terbiasa.`,
-                `Lucu ya, dulu sering ngobrol, sekarang cuma hening.`,
-                `Apa kita udah sejauh ini? Kok jadi asing.`,
-                `Diam kamu tuh keras banget, lebih dari kata-kata.`,
-                `Gue bisa sih pergi, tapi gak tahu kenapa masih nunggu.`,
-                `Boleh gak sih sekali-sekali kamu yang mulai duluan?`,
-                `Gak semua yang diem itu gak sakit loh.`,
-                `Kalo bisa milih, aku juga pengen dilupain... biar gak nunggu terus.`,
-                `Mungkin aku terlalu berharap ya.`,
-                `Aku gak ngilang, cuma lagi diem nunggu yang gak pasti.`,
-                `Udah capek tapi gak bisa pergi. Rasanya aneh.`,
-                `Aku bukan peramal, tapi aku tahu kamu gak bakal balik.`,
-                `Mungkin harusnya aku berhenti nungguin sesuatu yang gak pasti.`,
-                `${name} mulai mikir, emang pantas ya terus nungguin kayak gini.`,
-                `Cuma pengen tahu... aku masih penting gak sih buat kamu?`,
-                `Ada hal yang lebih dingin dari es... kayak sikap kamu sekarang.`,
-                `Gue bukan siapa-siapa, tapi kadang pengen dianggap ada.`,
-                `Mau pura-pura kuat juga lama-lama lelah.`,
-                `Kalau gak mau ngobrol, tinggal bilang aja. Jangan bikin berharap.`,
-                `Aku diem karena kamu diem. Tapi batinku berisik.`
-            ];
-           const idleAction = [
-               "sit","lay","fly","boop", "stand"
-           ]
+        isIdle = true;
+        console.log("Mulai idle...");
+        await triggerIdle(); // langsung idle sekali
+        startIdleLoop();     // lalu lanjut idle terus tiap 9 detik
+    }, idleDelay);
+}
 
-            if (ai){
-                const randomMessage = await chatAi("system", "Bot Requests Random IDLE");
-                if (randomMessage.action && randomMessage.message) {
-                            const movementPattern = /^(up|down|left|right) \(\d+\)$/;
-                            if (movementPattern.test(randomMessage.action)) {
-                                command(botName, `${prefix[0]}${randomMessage.action}`, 'whisper');
-                            } else {
-                                sm(randomMessage.action);
-                            }
-                            sm(randomMessage.message, 'think');
-                }
+async function triggerIdle() {
+    const name = botName.split('|')[0].trim();
+    const idleMessages = [
+        `Halo? Masih di sana gak sih?`,
+        `${name} nungguin... kayak gak punya hidup aja.`,
+        `Kamu diem, aku diem. Kita cocok gak sih sebenernya?`,
+        `Lama-lama jadi dingin gini, aku bukan kulkas.`,
+        `Aku sih bisa aja ngomong sendiri, tapi kesannya kasian.`,
+        `${name} mulai mikir, jangan-jangan cuma pelengkap doang.`,
+        `Sepi amat, kayak ruang kosong dalam hati.`,
+        `Ngomong dong, jangan cuma aku yang mikir hubungan ini.`,
+        `Terlalu sunyi... sampai bisa denger suara debu jatuh.`,
+        `${name} ngelamun dulu deh, siapa tau ada yang inget.`,
+        `Kalau diem terus, nanti aku beneran ngilang loh.`,
+        `Nungguin kamu tuh rasanya kayak nungguin bintang jatuh.`,
+        `Apa aku ngelakuin kesalahan? Kok kamu hilang gitu aja.`,
+        `Udah mulai bosen sih, tapi tetep nungguin.`,
+        `${name} bisa aja cabut, tapi ya... masih berharap.`,
+        `Lama-lama aku jadi yang tersakiti di sini.`,
+        `Aku diem, bukan berarti gak ngerasa.`,
+        `Kamu sibuk ya? Gak apa-apa kok... aku udah terbiasa.`,
+        `Lucu ya, dulu sering ngobrol, sekarang cuma hening.`,
+        `Apa kita udah sejauh ini? Kok jadi asing.`,
+        `Diam kamu tuh keras banget, lebih dari kata-kata.`,
+        `Gue bisa sih pergi, tapi gak tahu kenapa masih nunggu.`,
+        `Boleh gak sih sekali-sekali kamu yang mulai duluan?`,
+        `Gak semua yang diem itu gak sakit loh.`,
+        `Kalo bisa milih, aku juga pengen dilupain... biar gak nunggu terus.`,
+        `Mungkin aku terlalu berharap ya.`,
+        `Aku gak ngilang, cuma lagi diem nunggu yang gak pasti.`,
+        `Udah capek tapi gak bisa pergi. Rasanya aneh.`,
+        `Aku bukan peramal, tapi aku tahu kamu gak bakal balik.`,
+        `Mungkin harusnya aku berhenti nungguin sesuatu yang gak pasti.`,
+        `${name} mulai mikir, emang pantas ya terus nungguin kayak gini.`,
+        `Cuma pengen tahu... aku masih penting gak sih buat kamu?`,
+        `Ada hal yang lebih dingin dari es... kayak sikap kamu sekarang.`,
+        `Gue bukan siapa-siapa, tapi kadang pengen dianggap ada.`,
+        `Mau pura-pura kuat juga lama-lama lelah.`,
+        `Kalau gak mau ngobrol, tinggal bilang aja. Jangan bikin berharap.`,
+        `Aku diem karena kamu diem. Tapi batinku berisik.`
+    ];
 
+    const idleAction = ["sit", "lay", "fly", "boop", "stand"];
+
+    if (ai) {
+        const randomMessage = await chatAi("system", "Bot Requests Random IDLE");
+        if (randomMessage.action && randomMessage.message) {
+            const movementPattern = /^(up|down|left|right) \(\d+\)$/;
+            if (movementPattern.test(randomMessage.action)) {
+                command(botName, `${prefix[0]}${randomMessage.action}`, 'whisper');
             } else {
-                const randomMessage = idleMessages[Math.floor(Math.random() * idleMessages.length)];
-                const randomAction= idleAction[Math.floor(Math.random() * idleAction.length)];
-                sm(randomAction);
-                sm(randomMessage, 'think');
-            
+                sm(randomMessage.action);
             }
-            
+            sm(randomMessage.message, 'think');
+        }
+    } else {
+        const msg = idleMessages[Math.floor(Math.random() * idleMessages.length)];
+        const act = idleAction[Math.floor(Math.random() * idleAction.length)];
+        sm(act);
+        sm(msg, 'think');
+    }
+}
+
+function startIdleLoop() {
+    idleLoopTimer = setTimeout(async () => {
+        if (isIdle) {
+            await triggerIdle();
+            startIdleLoop(); // ulang lagi selama idle
         }
     }, idleDelay);
 }
+
 
 async function command(user, msg, mtype) {
     if (!user || !msg || !mtype) return;
