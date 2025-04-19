@@ -11,6 +11,11 @@ let idleLoopTimer;
 let isIdle = false;
 const idleDelay = [60000, 90000, 120000][Math.floor(Math.random() * 3)];
 
+function getRandomIdleDelay() {
+    const options = [60000, 90000, 120000, 70000, 40000];
+    return options[Math.floor(Math.random() * options.length)];
+}
+
 
 //========================
 
@@ -335,7 +340,7 @@ async function resetIdleTimer() {
         console.log("Mulai idle...");
         await triggerIdle(); // langsung idle sekali
         startIdleLoop();     // lalu lanjut idle terus tiap 9 detik
-    }, idleDelay);
+    }, getRandomIdleDelay());
 }
 
 async function triggerIdle() {
@@ -407,7 +412,7 @@ function startIdleLoop() {
             await triggerIdle();
             startIdleLoop(); // ulang lagi selama idle
         }
-    }, idleDelay);
+    }, getRandomIdleDelay());
 }
 
 
