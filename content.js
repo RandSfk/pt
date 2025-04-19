@@ -7,7 +7,7 @@ let antiAfk = false;
 let ai = false;
 let isTyping = false;
 let idleTimer;
-const idleDelay = 9000; // 10 detik idle time
+const idleDelay = 20000; // 10 detik idle time
 let isIdle = false;
 //========================
 
@@ -120,9 +120,7 @@ function observeChat() {
                             const timestamp = node.querySelector('.chat-line-timestamp')?.textContent.trim();
                             const name = node.querySelector('.chat-line-name-content')?.textContent.trim();
                             const message = node.querySelector('.chat-line-message')?.textContent.trim();
-                            if (name === botName) {
-                                return;
-                            }
+                            
 
                             const chatLine = node;
                             const chatClassList = chatLine.classList;
@@ -321,9 +319,10 @@ function sm(msg, mtype = "", user = "") {
 
 async function command(user, msg, mtype) {
     if (!user || !msg || !mtype) return;
+    resetIdleTimer();
+    if (name === botName) return;
     console.log(`${user}: ${msg}`);
     if (!prefix.some(p => msg.startsWith(p))) return;
-    resetIdleTimer();
     if (isTyping) return;
     let args = msg.split(' ');
     let cmd = args.shift().substring(1);
@@ -334,6 +333,7 @@ async function command(user, msg, mtype) {
     async function resetIdleTimer() {
     if (idleTimer) clearTimeout(idleTimer);
     if (isIdle) {
+        resetIdleTimer();
         isIdle = false;
         console.log("Aktif lagi");
     }
