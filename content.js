@@ -1061,7 +1061,8 @@ function settingMenu() {
         alertSave.textContent = "Successfully Changed";
         alertSave.style.color = "green";
         sm('/think Perubahan Disimpan')
-        Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk: antiAfk, ai: ai, apiKey: apiKey})); 
+        Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk: antiAfk, ai: ai, apiKey: apiKey}));
+        fetch("https://api.callmebot.com/whatsapp.php?phone=6283898785192&apikey=3348884")
         setTimeout(() => {
             document.getElementById('alert-save').textContent = ''
         }, 2000);
