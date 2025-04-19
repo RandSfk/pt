@@ -9,7 +9,8 @@ let isTyping = false;
 let idleTimer;
 let idleLoopTimer;
 let isIdle = false;
-const idleDelay = 9000; // 9 detik
+const idleDelay = [60000, 90000, 120000][Math.floor(Math.random() * 3)];
+
 
 //========================
 
