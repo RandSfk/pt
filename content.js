@@ -317,26 +317,12 @@ function sm(msg, mtype = "", user = "") {
     splitAndSend(msg);
 }
 
-async function command(user, msg, mtype) {
-    if (!user || !msg || !mtype) return;
-    if (!prefix.some(p => msg.startsWith(p))) return;
-    resetIdleTimer();
-    if (name === botName) return;
-    console.log(`${user}: ${msg}`);
-    if (!prefix.some(p => msg.startsWith(p))) return;
-    if (isTyping) return;
-    let args = msg.split(' ');
-    let cmd = args.shift().substring(1);
-    let text = args.join(' ');
-    let lastReplyTime = 0;
-
-    
-    async function resetIdleTimer() {
+async function resetIdleTimer() {
     if (idleTimer) clearTimeout(idleTimer);
     if (isIdle) {
         
         isIdle = false;
-        console.log("Aktif lagi");
+        sm("Aktif lagi");
     }
 
     idleTimer = setTimeout(async () => {
@@ -409,6 +395,21 @@ async function command(user, msg, mtype) {
         }
     }, idleDelay);
 }
+
+async function command(user, msg, mtype) {
+    if (!user || !msg || !mtype) return;
+    if (!prefix.some(p => msg.startsWith(p))) return;
+    resetIdleTimer();
+    if (name === botName) return;
+    console.log(`${user}: ${msg}`);
+    if (!prefix.some(p => msg.startsWith(p))) return;
+    if (isTyping) return;
+    let args = msg.split(' ');
+    let cmd = args.shift().substring(1);
+    let text = args.join(' ');
+    let lastReplyTime = 0;
+
+    
 
 
     function startMakeStory(user, numPlayers) {
