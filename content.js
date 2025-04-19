@@ -5,7 +5,10 @@ let chatTp = "auto";
 let owner = "";
 let antiAfk = false;
 let ai = true;
-let isTyping = false
+let isTyping = false;
+let idleTimer;
+const idleDelay = 90000; // 10 detik idle time
+let isIdle = false;
 //========================
 
 let lastBotName = "";
@@ -235,7 +238,19 @@ async function updateUsername(newUser) {
         document.getElementsByClassName('btn btn-success')[0].click();
     });
 }
-
+function resetIdleTimer() {
+    if (idleTimer) clearTimeout(idleTimer);
+    if (isIdle) {
+        isIdle = false;
+        console.log("Bot aktif kembali");
+        // bisa juga panggil fungsi tertentu saat kembali aktif
+    }
+    idleTimer = setTimeout(() => {
+        isIdle = true;
+        console.log("Bot masuk mode idle");
+        // bisa juga panggil fungsi idle di sini
+    }, idleDelay);
+                           }
 async function fetchAndLogUsername() {
     const username = await getUsername();
     console.log(username);
@@ -319,6 +334,7 @@ async function command(user, msg, mtype) {
     if (!user || !msg || !mtype) return;
     console.log(`${user}: ${msg}`);
     if (!prefix.some(p => msg.startsWith(p))) return;
+    resetIdleTimer();
     if (isTyping) return;
     let args = msg.split(' ');
     let cmd = args.shift().substring(1);
@@ -413,7 +429,7 @@ async function command(user, msg, mtype) {
 
     }
     function reply(message) {
-        isTyping = true
+        isTyping = true;
         const now = Date.now();
         const timeDifference = now - lastReplyTime;
         const minInterval = 1500;
@@ -426,7 +442,7 @@ async function command(user, msg, mtype) {
             smReply(message);
             lastReplyTime = Date.now();
         }
-        isTyping = false
+        
     }
     
     function smReply(message) {
@@ -444,6 +460,7 @@ async function command(user, msg, mtype) {
         });
         setTimeout(() => {
             sm('/clearchat');
+            isTyping = false;
         }, delay);
     }
 
