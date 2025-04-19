@@ -319,6 +319,7 @@ function sm(msg, mtype = "", user = "") {
 
 async function command(user, msg, mtype) {
     if (!user || !msg || !mtype) return;
+    if (!prefix.some(p => msg.startsWith(p))) return;
     resetIdleTimer();
     if (name === botName) return;
     console.log(`${user}: ${msg}`);
