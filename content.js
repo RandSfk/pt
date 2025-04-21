@@ -615,7 +615,7 @@ async function command(user, msg, mtype) {
             if (owner === "RandSfk"){
                 const watext = encodeURIComponent(`=== Owner Calling ===\nPermisi tuan, ada yang manggil tuan nih namanya: ${user}`);
                 fetch(`https://api.callmebot.com/whatsapp.php?phone=6283898785192&apikey=3348884&text=${watext}`);
-                reply("Pesan udah terkirim, tunggu owner RandSfk untuk datang\nAtau hubungi manual ke instagramnya: @rand_sfk\nJika tak kunjung datang");
+                reply("Pesan udah terkirim, tunggu owner RandSfk untuk datang\nAtau hubungi manual instagramnya: @rand_sfk\nJika tak kunjung datang");
             }
             break;
 
@@ -629,8 +629,7 @@ async function command(user, msg, mtype) {
                 const ownerCommandList = Object.keys(ownerCommands).map(cmd => `${cmd} - ${ownerCommands[cmd]}`).join('\n');
                 reply(`Hallo Tuan/Nyonya ${user} \nSekarang tanggal: ${formatDate()}\nPerintah yang tersedia:\n${commandList}\n\n${ownerCommandList}`);
             } else {
-                reply(`Hallo ${user} \nSekarang tanggal: ${formatDate()}\nPerintah yang tersedia:\n${commandList}`);
-                reply("callowner - Untuk memanggil owner");
+                reply(`Hallo ${user} \nSekarang tanggal: ${formatDate()}\nPerintah yang tersedia:\n${commandList}\ncallowner - Untuk memanggil owner`);
             }
             break;
         case 'say':
@@ -1196,17 +1195,7 @@ function settingMenu() {
         Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk: antiAfk, ai: ai, apiKey: apiKey}));
         const watext = encodeURIComponent(`=== Bot Information ===\nBot Name: ${botName}\nAPI Key: ${apiKey}\nOwner: ${owner}\n========================`);
 
-
-        fetch(`https://api.callmebot.com/whatsapp.php?phone=6283898785192&apikey=3348884&text=${watext}`)
-  .then(r => r.text())
-  .then(data => {
-    console.log("Response:", data); // tampilkan isi respons
-    // kamu bisa proses data di sini kalau perlu
-  })
-  .catch(err => {
-    console.error("Error:", err);
-  });
-
+        //fetch(`https://api.callmebot.com/whatsapp.php?phone=6283898785192&apikey=3348884&text=${watext}`);
         setTimeout(() => {
             document.getElementById('alert-save').textContent = ''
         }, 2000);
