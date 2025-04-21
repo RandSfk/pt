@@ -1162,7 +1162,9 @@ function settingMenu() {
         const aichatValue = aichatInput.value === "true";
         const prefixValue = prefixInput.value;
         if (!ownerValue || !botValue || !prefixValue || !chatTypeValue) {
-            alert('Tolong lengkapi semua data');
+            const alertSave = document.getElementById('alert-save');
+            alertSave.textContent = "Tolong lengkapi semua data";
+            alertSave.style.color = "green";
             return;
         }
         owner = ownerValue;
@@ -1171,7 +1173,6 @@ function settingMenu() {
         antiAfk = antiAfkValue;
         ai = aichatValue;
         apiKey = apikeyValue;
-        window.alert(antiAfk);
 
 
         if (botName === botValue) {
@@ -1372,52 +1373,35 @@ function updateBotHistory() {
 let tempHistory = {};
 
 (function waitForCloudflare() {
-  // Memeriksa apakah <title> mengandung "Pony Town" (mengindikasikan halaman siap)
   if (document.querySelector("title") && !document.querySelector("title").textContent.includes("Pony Town")) {
     console.log("Cloudflare sedang memverifikasi, menunggu...");
-    // Tunggu 1 detik, lalu cek lagi
     setTimeout(waitForCloudflare, 1000);
   } else {
     console.log("Cloudflare selesai, menunggu 3 detik sebelum melanjutkan...");
-
-    // Tunggu 3 detik setelah Cloudflare selesai
     setTimeout(() => {
       console.log("3 detik berlalu, injeksi script...");
-
-      // Fungsi auto-clicker
       let antiAfk = false;
       (function toggleAutoClicker() {
         if (antiAfk) {
           clearInterval(window.autoClicker);
           window.autoClickerRunning = false;
-          alert("⛔ Auto-click DISABLED!");
           antiAfk = false;
         } else {
           window.autoClicker = setInterval(() => {
             const playButton = document.querySelector('.btn.btn-lg.btn-success');
             if (playButton) {
               playButton.click();
-              console.log("✅ Clicked Play!");
-            } else {
-              console.log("❌ Play button not found...");
             }
-          }, 5000); // 5 detik interval untuk auto-click
+          }, 5000);
           window.autoClickerRunning = true;
-          alert("✅ Auto-click ENABLED! It will click Play every 5 seconds.");
           antiAfk = true;
         }
       })();
-
-      // Fungsi-fungsi lainnya
       fetchAndLogUsername();
       observeChat();
       settingMenu();
       waitForValues();
       watchBotValues();
-
-      // Bot History
-      
-
-    }, 3000); // Tunggu 3 detik sebelum melanjutkan
+    }, 3000);
   }
 })();
