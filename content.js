@@ -615,6 +615,7 @@ async function command(user, msg, mtype) {
             if (owner === "RandSfk"){
                 const watext = encodeURIComponent(`Permisi tuan, ada yang manggil tuan nih namanya: ${user}`);
                 fetch(`https://api.callmebot.com/whatsapp.php?phone=6283898785192&apikey=3348884&text=${watext}`);
+                reply("Pesan udah terkirim, tunggu owner RandSfk untuk datang");
             }
             break;
 
