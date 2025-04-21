@@ -1372,36 +1372,56 @@ function updateBotHistory() {
 }
 let tempHistory = {};
 
-(function waitForCloudflare() {
-  if (document.querySelector("title") && !document.querySelector("title").textContent.includes("Pony Town")) {
-    console.log("Cloudflare sedang memverifikasi, menunggu...");
-    setTimeout(waitForCloudflare, 1000);
-  } else {
-    console.log("Cloudflare selesai, menunggu 3 detik sebelum melanjutkan...");
-    setTimeout(() => {
-      console.log("3 detik berlalu, injeksi script...");
-      let antiAfk = false;
-      (function toggleAutoClicker() {
-        if (antiAfk) {
-          clearInterval(window.autoClicker);
-          window.autoClickerRunning = false;
-          antiAfk = false;
-        } else {
-          window.autoClicker = setInterval(() => {
-            const playButton = document.querySelector('.btn.btn-lg.btn-success');
-            if (playButton) {
-              playButton.click();
-            }
-          }, 5000);
-          window.autoClickerRunning = true;
-          antiAfk = true;
-        }
-      })();
-      fetchAndLogUsername();
-      observeChat();
-      settingMenu();
-      waitForValues();
-      watchBotValues();
-    }, 3000);
-  }
-})();
+function waitForCloudflare() {
+  setTimeout(() => {
+    try {
+      if (document.querySelector("title") && !document.querySelector("title").textContent.includes("Pony Town")) {
+        console.log("Cloudflare sedang memverifikasi, menunggu...");
+        waitForCloudflare(); // cek lagi setelah 1 detik
+      } else {
+        console.log("Cloudflare selesai, menunggu 3 detik sebelum melanjutkan...");
+        setTimeout(() => {
+          try {
+            console.log("3 detik berlalu, injeksi script...");
+            let antiAfk = false;
+            (function toggleAutoClicker() {
+              if (antiAfk) {
+                clearInterval(window.autoClicker);
+                window.autoClickerRunning = false;
+                antiAfk = false;
+              } else {
+                window.autoClicker = setInterval(() => {
+                  try {
+                    const playButton = document.querySelector('.btn.btn-lg.btn-success');
+                    if (playButton) {
+                      playButton.click();
+                    }
+                  } catch (err) {
+                    console.error("Error di autoClicker:", err);
+                  }
+                }, 5000);
+                window.autoClickerRunning = true;
+                antiAfk = true;
+              }
+            })();
+
+            // Jalankan fungsi-fungsi utama
+            fetchAndLogUsername();
+            observeChat();
+            settingMenu();
+            waitForValues();
+            watchBotValues();
+          } catch (err) {
+            console.error("Error di dalam eksekusi utama:", err);
+            waitForCloudflare(); // restart kalau error
+          }
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error saat cek cloudflare:", error);
+      waitForCloudflare(); // restart kalau error
+    }
+  }, 1000); // looping tiap 1 detik
+}
+
+waitForCloudflare();
