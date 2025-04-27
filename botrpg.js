@@ -243,10 +243,10 @@ async function command(user, msg, mtype) {
         case "create":
         case "regis":
             if (!text && args.length < 2) {
-                sm('masukan password, contoh:\n.daftar password123')
+                sm('masukan password, contoh:\n.daftar password123 mage')
             }
             let password = args[0]
-            let classrpg = args[1] || 'warrior' // default class jika tidak diberikan
+            let classrpg = args[1] || 'warrior'
             console.log(password, classrpg)
     
             // Panggil fungsi untuk membuat akun baru
