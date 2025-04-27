@@ -228,14 +228,10 @@ async function command(user, msg, mtype) {
     let cmd = args.shift().substring(1);
     let text = args.join(' ');
     let lastReplyTime = 0;
-    let botname = ""
-    if (botName === "Guild Master") {
-        botName = "guild_master";
-    } else if (botName === "Dungeon Master") {
-        botName = "dungeon_master";
-    } else {
-        botName = "unknown_bot";
-    }
+    const normalizedBotName =
+        botName === "Guild Master"    ? "guild_master" :
+        botName === "Dungeon Master"  ? "dungeon_master" :
+                                        "unknown_bot";
 
     switch (cmd) { 
         case "daftar":
@@ -243,14 +239,12 @@ async function command(user, msg, mtype) {
         case "create":
         case "regis":
             if (!text && args.length < 2) {
-                sm('masukan password, contoh:\n.daftar password123')
+                sm('masukan password, contoh:\n.daftar password123 mage')
             }
             let password = args[0]
-            let classrpg = args[1] || 'warrior' // default class jika tidak diberikan
+            let classrpg = args[1] || 'warrior'
             console.log(password, classrpg)
-    
-            // Panggil fungsi untuk membuat akun baru
-            let hasil = await rpgs(botname, user, 'new_user', {"username":user, "password": password, "class": classrpg})
+            let hasil = await rpgs(normalizedBotName, user, 'new_user', {"username":user, "password": password, "class": classrpg})
             sm(hasil, mtype, user)
             break;
     
@@ -260,33 +254,31 @@ async function command(user, msg, mtype) {
             }
             let loginPassword = args[0]
             console.log("Login dengan password:", loginPassword)
-    
-            // Panggil fungsi login
-            let loginResult = await rpgs(botname, user, 'login', {"username": user, "password": loginPassword})
+            let loginResult = await rpgs(normalizedBotName, user, 'login', {"username": user, "password": loginPassword})
             sm(loginResult, mtype, user)
             break;
     
         case "status":
             // Panggil fungsi untuk mendapatkan status
-            let statusResult = await rpgs(botname, user, 'get_status')
+            let statusResult = await rpgs(normalizedBotName, user, 'get_status')
             sm(statusResult, mtype, user)
             break;
     
         case "levelup":
             // Panggil fungsi untuk level up
-            let levelUpResult = await rpgs(botname, user, 'level_up', {"username": user})
+            let levelUpResult = await rpgs(normalizedBotName, user, 'level_up', {"username": user})
             sm(levelUpResult, mtype, user)
             break;
     
         case "reset":
             // Panggil fungsi untuk reset user
-            let resetResult = await rpgs(botname, user, 'reset_user', {"username": user})
+            let resetResult = await rpgs(normalizedBotName, user, 'reset_user', {"username": user})
             sm(resetResult, mtype, user)
             break;
     
         case "dungeon":
             // Panggil fungsi untuk masuk dungeon
-            let dungeonResult = await rpgs(botname, user, 'dungeon', {"username": user})
+            let dungeonResult = await rpgs(normalizedBotName, user, 'dungeon', {"username": user})
             sm(dungeonResult, mtype, user)
             break;
     
@@ -295,7 +287,7 @@ async function command(user, msg, mtype) {
             console.log("Bertarung dengan serangan:", attackType)
     
             // Panggil fungsi untuk bertarung
-            let battleResult = await rpgs(botname, user, 'battle', {"username": user, "attack_type": attackType})
+            let battleResult = await rpgs(normalizedBotName, user, 'battle', {"username": user, "attack_type": attackType})
             sm(battleResult, mtype, user)
             break;
     
@@ -304,7 +296,7 @@ async function command(user, msg, mtype) {
             console.log("Membuka", count, "loot crates")
     
             // Panggil fungsi untuk membuka loot crates
-            let lootResult = await rpgs(botname, user, 'open_loot_crates', {"username": user, "count": count})
+            let lootResult = await rpgs(normalizedBotName, user, 'open_loot_crates', {"username": user, "count": count})
             sm(lootResult, mtype, user)
             break;
     
@@ -314,9 +306,9 @@ async function command(user, msg, mtype) {
     
 }
 
-async function rpgs(botname, user, cmd, payload = null) {
+async function rpgs(normalizedBotName, user, cmd, payload = null) {
     try {
-      const url = `https://ptbot-server.vercel.app/${botname}/${user}/${cmd}`;
+      const url = `https://ptbot-server.vercel.app/${normalizedBotName}/${user}/${cmd}`;
       const options = {
         method: payload ? 'POST' : 'GET',
         headers: {
@@ -347,8 +339,35 @@ async function rpgs(botname, user, cmd, payload = null) {
       
     } catch (error) {
       console.error('Fetch error:', error);
-      return 'Error: '+ error.message;
+      return 'Terjadi kesalahan saat menghubungi server.';
     }
+}
+  
+  
+async function fetchdatarpg(user, cmd) {
+  try {
+    const response = await fetch(`https://ptbot-server.vercel.app/guild_master/${user}/${cmd}`);
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    
+    const contentType = response.headers.get('content-type');
+    
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json();
+      if (data.result) {
+        return data.result; // kalau ada "result"
+      } else if (data.error) {
+        return data.error; // kalau ada "error"
+      } else {
+        return 'Data tidak diketahui.';
+      }
+    } else {
+      return "Data bukan json";
+    }
+    
+  } catch (error) {
+    console.error('Fetch error:', error);
+    return 'Terjadi kesalahan saat menghubungi server.';
+  }
 }
 
 
@@ -543,7 +562,7 @@ function settingMenu() {
 function modifyPage() {
     var header = document.querySelector(".form-group.text-start.text-large h5");
     if (header && header.textContent.trim() === "Server rules") {
-        header.textContent = "Pony Town RPG";
+        header.textContent = "Pony Town-Bot";
         header.style.textAlign = 'center';
         header.style.marginTop = '20px';
     }
