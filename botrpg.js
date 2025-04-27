@@ -260,7 +260,7 @@ async function command(user, msg, mtype) {
     
         case "status":
             // Panggil fungsi untuk mendapatkan status
-            let statusResult = await rpgs(normalizedBotName, user, 'get_status')
+            let statusResult = await rpgs(normalizedBotName, user, 'get_status', {"username": user})
             sm(statusResult, mtype, user)
             break;
     
@@ -283,10 +283,9 @@ async function command(user, msg, mtype) {
             break;
     
         case "battle":
-            let attackType = args[0] || 'physical' // default attack jika tidak diberikan
+            let attackType = args[0] || 'physical'
             console.log("Bertarung dengan serangan:", attackType)
     
-            // Panggil fungsi untuk bertarung
             let battleResult = await rpgs(normalizedBotName, user, 'battle', {"username": user, "attack_type": attackType})
             sm(battleResult, mtype, user)
             break;
