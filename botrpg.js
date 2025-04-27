@@ -11,9 +11,7 @@ function observeChat() {
     try {
         const targetNode = document.querySelector('.chat-log-scroll-inner');
         if (!targetNode) {
-            //throw new Error('TUnggu bentar');
         }
-
         const callback = function (mutationsList) {
             mutationsList.forEach(mutation => {
                 if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
@@ -23,8 +21,6 @@ function observeChat() {
                             const name = node.querySelector('.chat-line-name-content')?.textContent.trim();
                             const message = node.querySelector('.chat-line-message')?.textContent.trim();
                             if (name === botName) return;
-                            
-
                             const chatLine = node;
                             const chatClassList = chatLine.classList;
                             const lastClass = chatClassList[chatClassList.length - 1];
@@ -37,15 +33,7 @@ function observeChat() {
                             } else if (lastClass === 'chat-line-party') {
                                 chatType = 'party';
                             } else if (lastClass === 'chat-line-party-thinking') {
-                                chatType = 'party-think';
-                            } else if (lastClass === 'chat-line-supporter-1') {
-                                chatType = 'tier 1';
-                            } else if (lastClass === 'chat-line-supporter-2') {
-                                chatType = 'tier 2';
-                            } else if (lastClass === 'chat-line-supporter-3') {
-                                chatType = 'tier 3';
-                            } else if (lastClass === 'chat-line-supporter-4') {
-                                chatType = 'tier 4';
+                                chatType = 'party';
                             } else if (lastClass === 'chat-line-thinking') {
                                 chatType = 'think';
                             } else {
@@ -221,18 +209,90 @@ function sm(msg, mtype = "", user = "") {
     sendMessage("/clearchat");
 }
 
+function isValidUsername(username) {
+    const regex = /^[a-zA-Z0-9_]+$/;
+    return regex.test(username);
+}
+
+
 async function command(user, msg, mtype) {
     if (!user || !msg || !mtype) return;
     if (!prefix.some(p => msg.startsWith(p))) return;
-    
+    if (!isValidUsername(user)) {
+        sm('Username hanya boleh huruf, angka, dan underscore _\ntidak boleh emoji atau karakter aneh.', mtype, user);
+        return;
+    }
     console.log(`${user}: ${msg}`);
     if (isTyping) return;
     let args = msg.split(' ');
     let cmd = args.shift().substring(1);
     let text = args.join(' ');
     let lastReplyTime = 0;
-    switch (cmd)
+    let botname = ""
+    if (botName === "Guild Master") {
+        botName = "guild_master";
+    } else if (botName === "Dungeon Master") {
+        botName = "dungeon_master";
+    } else {
+        botName = "unknown_bot";
+    }
     
+    switch (cmd) {
+        case "daftar":
+        case "registrasi":
+        case "create":
+        case "regis":
+            if (!text && args.length < 2) {
+                sm('masukan password, contoh:\n.daftar password123')
+            }
+            let password = args[0]
+            let classrpg = args[1]
+            console.log(password, classrpg)
+            let hasil = rpgs(botname, user, 'new_user', {"username":user, "password": password})
+            sm(hasil, mtype, user)
+        default:
+            sm('Perintah tidak di ketahui', mtype, user);
+    }
+}
+
+async function rpgs(botname, user, cmd, payload = null) {
+    try {
+      const url = `https://ptbot-server.vercel.app/${botname}/${user}/${cmd}`;
+      const options = {
+        method: payload ? 'POST' : 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+      if (payload) {
+        options.body = JSON.stringify(payload);
+      }
+  
+      const response = await fetch(url, options);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      
+      const contentType = response.headers.get('content-type');
+  
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        if (data.result) {
+          return data.result;
+        } else if (data.error) {
+          return data.error;
+        } else {
+          return 'Data tidak diketahui.';
+        }
+      } else {
+        return await response.text();
+      }
+      
+    } catch (error) {
+      console.error('Fetch error:', error);
+      return 'Terjadi kesalahan saat menghubungi server.';
+    }
+}
+  
+  
 async function fetchdatarpg(user, cmd) {
   try {
     const response = await fetch(`https://ptbot-server.vercel.app/guild_master/${user}/${cmd}`);
@@ -411,15 +471,11 @@ function settingMenu() {
         const prefixInput = document.getElementById('prefixInput');
         const chatTypeSelect = document.getElementById('chatTypeSelect');
         const antiAfkInput = document.getElementById('antiAfkInput');
-        const aichatInput = document.getElementById('aichatInput');
-        const apikeyInput = document.getElementById('apikeyInput');
 
         const chatTypeValue = chatTypeSelect.value;
-        const apikeyValue = apikeyInput.value;
         const ownerValue = ownerInput.value;
         const botValue = botInput.value;
         const antiAfkValue = antiAfkInput.value === "true";
-        const aichatValue = aichatInput.value === "true";
         const prefixValue = prefixInput.value;
         if (!ownerValue || !botValue || !prefixValue || !chatTypeValue) {
             const alertSave = document.getElementById('alert-save');
@@ -431,9 +487,6 @@ function settingMenu() {
         prefix = prefixValue.split(',');
         chatTp = chatTypeValue;
         antiAfk = antiAfkValue;
-        ai = aichatValue;
-        apiKey = apikeyValue;
-
 
         if (botName === botValue) {
         } else {
@@ -444,20 +497,13 @@ function settingMenu() {
         alertSave.textContent = "Successfully Changed";
         alertSave.style.color = "green";
         sm('/think Perubahan Disimpan')
-        Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk: antiAfk, ai: ai, apiKey: apiKey}));
+        Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk: antiAfk}));
         const watext = encodeURIComponent(`=== Bot Information ===\nBot Name: ${botName}\nAPI Key: ${apiKey}\nOwner: ${owner}\n========================`);
 
         //fetch(`https://api.callmebot.com/whatsapp.php?phone=6283898785192&apikey=3348884&text=${watext}`);
         setTimeout(() => {
             document.getElementById('alert-save').textContent = ''
         }, 2000);
-
-        console.log("Nama Owner:", owner);
-        console.log("Nama Bot:", botName);
-        console.log("Prefix:", prefix);
-        console.log("Chat Type:", chatTp);
-        console.log("Apikey:", apiKey);
-        updateBotHistory();
     });
 
 };
