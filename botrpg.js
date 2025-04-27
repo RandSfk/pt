@@ -260,7 +260,7 @@ async function command(user, msg, mtype) {
     
         case "status":
             // Panggil fungsi untuk mendapatkan status
-            let statusResult = await rpgs(normalizedBotName, user, 'status', {"username": user})
+            let statusResult = await rpgs(normalizedBotName, user, 'status')
             sm(statusResult, mtype, user)
             break;
     
