@@ -543,7 +543,7 @@ function settingMenu() {
 function modifyPage() {
     var header = document.querySelector(".form-group.text-start.text-large h5");
     if (header && header.textContent.trim() === "Server rules") {
-        header.textContent = "Pony Town-Bot";
+        header.textContent = "Pony Town RPG";
         header.style.textAlign = 'center';
         header.style.marginTop = '20px';
     }
