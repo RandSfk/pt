@@ -243,10 +243,10 @@ async function command(user, msg, mtype) {
         case "create":
         case "regis":
             if (!text && args.length < 2) {
-                sm('masukan password, contoh:\n.daftar password123 mage')
+                sm('masukan password, contoh:\n.daftar password123')
             }
             let password = args[0]
-            let classrpg = args[1] || 'warrior'
+            let classrpg = args[1] || 'warrior' // default class jika tidak diberikan
             console.log(password, classrpg)
     
             // Panggil fungsi untuk membuat akun baru
@@ -347,35 +347,8 @@ async function rpgs(botname, user, cmd, payload = null) {
       
     } catch (error) {
       console.error('Fetch error:', error);
-      return 'Terjadi kesalahan saat menghubungi server.';
+      return 'Error: '+ error.message;
     }
-}
-  
-  
-async function fetchdatarpg(user, cmd) {
-  try {
-    const response = await fetch(`https://ptbot-server.vercel.app/guild_master/${user}/${cmd}`);
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    
-    const contentType = response.headers.get('content-type');
-    
-    if (contentType && contentType.includes('application/json')) {
-      const data = await response.json();
-      if (data.result) {
-        return data.result; // kalau ada "result"
-      } else if (data.error) {
-        return data.error; // kalau ada "error"
-      } else {
-        return 'Data tidak diketahui.';
-      }
-    } else {
-      return "Data bukan json";
-    }
-    
-  } catch (error) {
-    console.error('Fetch error:', error);
-    return 'Terjadi kesalahan saat menghubungi server.';
-  }
 }
 
 
