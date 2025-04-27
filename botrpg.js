@@ -230,11 +230,11 @@ async function command(user, msg, mtype) {
     let lastReplyTime = 0;
     let botname = ""
     if (botName === "Guild Master") {
-        botname = "guild_master";
+        botName = "guild_master";
     } else if (botName === "Dungeon Master") {
-        botname = "dungeon_master";
+        botName = "dungeon_master";
     } else {
-        botname = "unknown_bot";
+        botName = "unknown_bot";
     }
 
     switch (cmd) { 
@@ -268,7 +268,7 @@ async function command(user, msg, mtype) {
     
         case "status":
             // Panggil fungsi untuk mendapatkan status
-            let statusResult = await rpgs(botname, user, 'get_status', {"username": user})
+            let statusResult = await rpgs(botname, user, 'get_status')
             sm(statusResult, mtype, user)
             break;
     
