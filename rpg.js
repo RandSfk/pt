@@ -294,7 +294,7 @@ async function command(user, msg, mtype) {
                     else if (at === 'p') attackType = 'physical';
                     else attackType = at;
                 }
-                let result = await rpgs('dungeon_master', user, 'battle', {"username": user, "attack_type": attackType});
+                let result = await rpgs('dungeon_master', user, 'battle', {"username": user, "type": attackType});
                 sm(result, mtype, user);
                 break;
             }
