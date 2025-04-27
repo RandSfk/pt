@@ -236,8 +236,8 @@ async function command(user, msg, mtype) {
     } else {
         botName = "unknown_bot";
     }
-    
-    switch (cmd) {
+
+    switch (cmd) { 
         case "daftar":
         case "registrasi":
         case "create":
@@ -246,13 +246,72 @@ async function command(user, msg, mtype) {
                 sm('masukan password, contoh:\n.daftar password123')
             }
             let password = args[0]
-            let classrpg = args[1]
+            let classrpg = args[1] || 'warrior' // default class jika tidak diberikan
             console.log(password, classrpg)
-            let hasil = rpgs(botname, user, 'new_user', {"username":user, "password": password})
+    
+            // Panggil fungsi untuk membuat akun baru
+            let hasil = await rpgs(botname, user, 'new_user', {"username":user, "password": password, "class": classrpg})
             sm(hasil, mtype, user)
+            break;
+    
+        case "login":
+            if (args.length < 1) {
+                sm('Masukkan password, contoh:\n.login password123')
+            }
+            let loginPassword = args[0]
+            console.log("Login dengan password:", loginPassword)
+    
+            // Panggil fungsi login
+            let loginResult = await rpgs(botname, user, 'login', {"username": user, "password": loginPassword})
+            sm(loginResult, mtype, user)
+            break;
+    
+        case "status":
+            // Panggil fungsi untuk mendapatkan status
+            let statusResult = await rpgs(botname, user, 'get_status', {"username": user})
+            sm(statusResult, mtype, user)
+            break;
+    
+        case "levelup":
+            // Panggil fungsi untuk level up
+            let levelUpResult = await rpgs(botname, user, 'level_up', {"username": user})
+            sm(levelUpResult, mtype, user)
+            break;
+    
+        case "reset":
+            // Panggil fungsi untuk reset user
+            let resetResult = await rpgs(botname, user, 'reset_user', {"username": user})
+            sm(resetResult, mtype, user)
+            break;
+    
+        case "dungeon":
+            // Panggil fungsi untuk masuk dungeon
+            let dungeonResult = await rpgs(botname, user, 'dungeon', {"username": user})
+            sm(dungeonResult, mtype, user)
+            break;
+    
+        case "battle":
+            let attackType = args[0] || 'physical' // default attack jika tidak diberikan
+            console.log("Bertarung dengan serangan:", attackType)
+    
+            // Panggil fungsi untuk bertarung
+            let battleResult = await rpgs(botname, user, 'battle', {"username": user, "attack_type": attackType})
+            sm(battleResult, mtype, user)
+            break;
+    
+        case "loot":
+            let count = args[0] || 1 // default count 1 jika tidak diberikan
+            console.log("Membuka", count, "loot crates")
+    
+            // Panggil fungsi untuk membuka loot crates
+            let lootResult = await rpgs(botname, user, 'open_loot_crates', {"username": user, "count": count})
+            sm(lootResult, mtype, user)
+            break;
+    
         default:
             sm('Perintah tidak di ketahui', mtype, user);
     }
+    
 }
 
 async function rpgs(botname, user, cmd, payload = null) {
