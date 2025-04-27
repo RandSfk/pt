@@ -230,11 +230,11 @@ async function command(user, msg, mtype) {
     let lastReplyTime = 0;
     let botname = ""
     if (botName === "Guild Master") {
-        botName = "guild_master";
+        botname = "guild_master";
     } else if (botName === "Dungeon Master") {
-        botName = "dungeon_master";
+        botname = "dungeon_master";
     } else {
-        botName = "unknown_bot";
+        botname = "unknown_bot";
     }
 
     switch (cmd) { 
