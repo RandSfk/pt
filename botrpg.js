@@ -344,41 +344,37 @@ async function rpgs(normalizedBotName, user, cmd, payload = null) {
 
 async function get_rpgs(normalizedBotName, user, cmd) {
     try {
-      const url = `https://ptbot-server.vercel.app/${normalizedBotName}/${user}/${cmd}`;
-      const options = {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-      if (payload) {
-        options.body = JSON.stringify(payload);
-      }
-  
-      const response = await fetch(url, options);
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-      
-      const contentType = response.headers.get('content-type');
-  
-      if (contentType && contentType.includes('application/json')) {
-        const data = await response.json();
-        if (data.result) {
-          return data.result;
-        } else if (data.error) {
-          return data.error;
+        const url = `https://ptbot-server.vercel.app/${normalizedBotName}/${user}/${cmd}`;
+        const options = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+        const contentType = response.headers.get('content-type');
+
+        if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            if (data.result) {
+                return data.result;
+            } else if (data.error) {
+                return data.error;
+            } else {
+                return 'Data tidak diketahui.';
+            }
         } else {
-          return 'Data tidak diketahui.';
+            return await response.text();
         }
-      } else {
-        return await response.text();
-      }
-      
+
     } catch (error) {
-      console.error('Fetch error:', error);
-      return 'Terjadi kesalahan saat menghubungi server.';
+        console.error('Fetch error:', error);
+        return 'Terjadi kesalahan saat menghubungi server.';
     }
 }
-
 
 function settingMenu() {
     try {
