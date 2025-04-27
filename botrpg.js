@@ -260,7 +260,7 @@ async function command(user, msg, mtype) {
     
         case "status":
             // Panggil fungsi untuk mendapatkan status
-            let statusResult = await rpgs(normalizedBotName, user, 'status')
+            let statusResult = await get_rpgs(normalizedBotName, user, 'status')
             sm(statusResult, mtype, user)
             break;
     
@@ -341,32 +341,42 @@ async function rpgs(normalizedBotName, user, cmd, payload = null) {
       return 'Terjadi kesalahan saat menghubungi server.';
     }
 }
-  
-  
-async function fetchdatarpg(user, cmd) {
-  try {
-    const response = await fetch(`https://ptbot-server.vercel.app/guild_master/${user}/${cmd}`);
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-    
-    const contentType = response.headers.get('content-type');
-    
-    if (contentType && contentType.includes('application/json')) {
-      const data = await response.json();
-      if (data.result) {
-        return data.result; // kalau ada "result"
-      } else if (data.error) {
-        return data.error; // kalau ada "error"
-      } else {
-        return 'Data tidak diketahui.';
+
+async function get_rpgs(normalizedBotName, user, cmd) {
+    try {
+      const url = `https://ptbot-server.vercel.app/${normalizedBotName}/${user}/${cmd}`;
+      const options = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+      if (payload) {
+        options.body = JSON.stringify(payload);
       }
-    } else {
-      return "Data bukan json";
+  
+      const response = await fetch(url, options);
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      
+      const contentType = response.headers.get('content-type');
+  
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        if (data.result) {
+          return data.result;
+        } else if (data.error) {
+          return data.error;
+        } else {
+          return 'Data tidak diketahui.';
+        }
+      } else {
+        return await response.text();
+      }
+      
+    } catch (error) {
+      console.error('Fetch error:', error);
+      return 'Terjadi kesalahan saat menghubungi server.';
     }
-    
-  } catch (error) {
-    console.error('Fetch error:', error);
-    return 'Terjadi kesalahan saat menghubungi server.';
-  }
 }
 
 
@@ -385,41 +395,41 @@ function settingMenu() {
         dropdown.classList.add('deropdown');
 
         dropdown.innerHTML = `
-    <div class="text-success py-1" style="display: flex; align-items: center;">
-        <label for="ownerInput" style="width: 200px;">Nama Owner</label>
-        <input class="form-control" type="text" id="ownerInput" name="owner" style="width: 200px; height: 20px;" placeholder="Masukkan nama owner..." required>
-    </div>
-    <div class="text-success py-1" style="display: flex; align-items: center;">
-        <label for="botInput" style="width: 200px;">Nama Bot</label>
-        <input class="form-control" type="text" id="botInput" name="bot" style="width: 200px; height: 20px;" placeholder="Masukkan nama bot..." required>
-    </div>
-    <div class="text-success py-1" style="display: flex; align-items: center;">
-        <label for="prefixInput" style="width: 200px;">Prefix</label>
-        <input class="form-control" type="text" id="prefixInput" name="prefix" style="width: 200px; height: 20px;" placeholder="Masukkan prefix gunakan , untuk lebih dari 1" required>
-    </div>
-    <div class="text-success py-1" style="display: flex; align-items: center;">
-        <label for="chatTypeSelect" style="width: 200px;">Chat Type</label>
-        <select class="form-control" id="chatTypeSelect" name="chattype" style="width: 200px; height: 30px;" required>
-            <option value="auto">Auto</option>
-            <option value="normal">Normal</option>
-            <option value="think">Think</option>
-        </select>
-    </div>
-    <div class="text-success py-1" style="display: flex; align-items: center;">
-        <label for="chatTypeSelect" style="width: 200px;">Anti Afk</label>
-        <select class="form-control" id="antiAfkInput" name="antiAfk" style="width: 200px; height: 30px;" required>
-            <option value="true">On</option>
-            <option value="false">Off</option>
-        </select>
-    </div>
-    <div style="margin-top: 10px; display: flex; justify-content: flex-start; align-items: center;">
-        <button id="settingsForm" class="btn btn-primary" style="height: 30px; width: 100px;" type="submit">Save</button>
-    </div>
-    <div class="py-1" style="display: flex; align-items: center;">
-        <div id="alert-save"></div>
-    </div>
+            <div class="text-success py-1" style="display: flex; align-items: center;">
+                <label for="ownerInput" style="width: 200px;">Nama Owner</label>
+                <input class="form-control" type="text" id="ownerInput" name="owner" style="width: 200px; height: 20px;" placeholder="Masukkan nama owner..." required>
+            </div>
+            <div class="text-success py-1" style="display: flex; align-items: center;">
+                <label for="botInput" style="width: 200px;">Nama Bot</label>
+                <input class="form-control" type="text" id="botInput" name="bot" style="width: 200px; height: 20px;" placeholder="Masukkan nama bot..." required>
+            </div>
+            <div class="text-success py-1" style="display: flex; align-items: center;">
+                <label for="prefixInput" style="width: 200px;">Prefix</label>
+                <input class="form-control" type="text" id="prefixInput" name="prefix" style="width: 200px; height: 20px;" placeholder="Masukkan prefix gunakan , untuk lebih dari 1" required>
+            </div>
+            <div class="text-success py-1" style="display: flex; align-items: center;">
+                <label for="chatTypeSelect" style="width: 200px;">Chat Type</label>
+                <select class="form-control" id="chatTypeSelect" name="chattype" style="width: 200px; height: 30px;" required>
+                    <option value="auto">Auto</option>
+                    <option value="normal">Normal</option>
+                    <option value="think">Think</option>
+                </select>
+            </div>
+            <div class="text-success py-1" style="display: flex; align-items: center;">
+                <label for="chatTypeSelect" style="width: 200px;">Anti Afk</label>
+                <select class="form-control" id="antiAfkInput" name="antiAfk" style="width: 200px; height: 30px;" required>
+                    <option value="true">On</option>
+                    <option value="false">Off</option>
+                </select>
+            </div>
+            <div style="margin-top: 10px; display: flex; justify-content: flex-start; align-items: center;">
+                <button id="settingsForm" class="btn btn-primary" style="height: 30px; width: 100px;" type="submit">Save</button>
+            </div>
+            <div class="py-1" style="display: flex; align-items: center;">
+                <div id="alert-save"></div>
+            </div>
 
-`;
+        `;
 
         const customBlock = document.createElement('div');
         customBlock.classList.add('custom-blocks');
@@ -446,64 +456,64 @@ function settingMenu() {
 
         const style = document.createElement('style');
         style.innerHTML = `
-    .custom-blocks {
-        position: relative;
-        display: inline-block;
-    }
+            .custom-blocks {
+                position: relative;
+                display: inline-block;
+            }
 
-    .tombol-setting {
-        background-color: transparent;
-        color: white;
-        border: none;
-        cursor: pointer;
-        font-size: 24px;
-        border-radius: 5px;
-        shadow: 0 6px 9px rgba(0, 0, 0, 0.7);
-    }
+            .tombol-setting {
+                background-color: transparent;
+                color: white;
+                border: none;
+                cursor: pointer;
+                font-size: 24px;
+                border-radius: 5px;
+                shadow: 0 6px 9px rgba(0, 0, 0, 0.7);
+            }
 
-    .tombol-setting:hover {
-        background-color: transparent;
-        color: #ccc;
-    }
+            .tombol-setting:hover {
+                background-color: transparent;
+                color: #ccc;
+            }
 
-    .deropdown {
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: white;
-        border: 1px solid #ccc;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        border-radius: 5px;
-        padding: 10px;
-        min-width: 10px;
-        display: none;
-        z-index: 1;
-        margin-top: 50px;
-        width: 290px;
-    }
+            .deropdown {
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: white;
+                border: 1px solid #ccc;
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+                border-radius: 5px;
+                padding: 10px;
+                min-width: 10px;
+                display: none;
+                z-index: 1;
+                margin-top: 50px;
+                width: 290px;
+            }
 
-    .deropdown::before {
-        content: '';
-        position: absolute;
-        top: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-width: 10px;
-        border-style: solid;
-        border-color: transparent transparent white transparent;
-        margin-top: -9px;
-    }
+            .deropdown::before {
+                content: '';
+                position: absolute;
+                top: -10px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-width: 10px;
+                border-style: solid;
+                border-color: transparent transparent white transparent;
+                margin-top: -9px;
+            }
 
-    .deropdown div {
-        padding: 0px 0px;
-        cursor: pointer;
-    }
+            .deropdown div {
+                padding: 0px 0px;
+                cursor: pointer;
+            }
 
-    .deropdown div:hover {
-        background-color: #f1f1f1;
-    }
-`;
+            .deropdown div:hover {
+                background-color: #f1f1f1;
+            }
+        `;
         document.head.appendChild(style);
 
         const fontAwesomeLink = document.createElement('link');
@@ -547,7 +557,7 @@ function settingMenu() {
         alertSave.textContent = "Successfully Changed";
         alertSave.style.color = "green";
         sm('/think Perubahan Disimpan')
-        Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk: antiAfk}));
+        //Android.saveSettings(JSON.stringify({ owner: owner, botName:botName, prefix: prefix, chatTp: chatTp, antiAfk: antiAfk}));
         const watext = encodeURIComponent(`=== Bot Information ===\nBot Name: ${botName}\nAPI Key: ${apiKey}\nOwner: ${owner}\n========================`);
 
         //fetch(`https://api.callmebot.com/whatsapp.php?phone=6283898785192&apikey=3348884&text=${watext}`);
