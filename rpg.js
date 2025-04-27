@@ -4,9 +4,8 @@ let chatTp = "auto";
 let owner = "";
 let antiAfk = false;
 let isTyping = false;
-
+let idbot = ''
 //========================
-
 function observeChat() {
     try {
         const targetNode = document.querySelector('.chat-log-scroll-inner');
@@ -228,84 +227,97 @@ async function command(user, msg, mtype) {
     let cmd = args.shift().substring(1);
     let text = args.join(' ');
     let lastReplyTime = 0;
-    const normalizedBotName =
+    const idbot =
         botName === "Guild Master"    ? "guild_master" :
         botName === "Dungeon Master"  ? "dungeon_master" :
                                         "unknown_bot";
 
-    switch (cmd) { 
-        case "daftar":
-        case "registrasi":
-        case "create":
-        case "regis":
-            if (!text && args.length < 2) {
-                sm('masukan password, contoh:\n.daftar password123 mage')
+    if (idbot == 'guild_master') {
+        switch (cmd) {
+            case 'daftar':
+            case 'registrasi':
+            case 'create':
+            case 'regis': {
+                if (!args[0]) return sm('Masukkan password, contoh:\n.daftar password123 mage', mtype, user);
+                let password = args[0];
+                let classrpg = args[1] || 'warrior';
+                let result = await rpgs('guild_master', user, 'new_user', {"username": user, "password": password, "class": classrpg});
+                sm(result, mtype, user);
+                break;
             }
-            let password = args[0]
-            let classrpg = args[1] || 'warrior'
-            console.log(password, classrpg)
-            let hasil = await rpgs(normalizedBotName, user, 'new_user', {"username":user, "password": password, "class": classrpg})
-            sm(hasil, mtype, user)
-            break;
-    
-        case "login":
-            if (args.length < 1) {
-                sm('Masukkan password, contoh:\n.login password123')
+
+            case 'login': {
+                if (!args[0]) return sm('Masukkan password, contoh:\n.login password123', mtype, user);
+                let password = args[0];
+                let result = await rpgs('guild_master', user, 'login', {"username": user, "password": password});
+                sm(result, mtype, user);
+                break;
             }
-            let loginPassword = args[0]
-            console.log("Login dengan password:", loginPassword)
-            let loginResult = await rpgs(normalizedBotName, user, 'login', {"username": user, "password": loginPassword})
-            sm(loginResult, mtype, user)
-            break;
-    
-        case "status":
-            // Panggil fungsi untuk mendapatkan status
-            let statusResult = await get_rpgs(normalizedBotName, user, 'status')
-            sm(statusResult, mtype, user)
-            break;
-    
-        case "levelup":
-            // Panggil fungsi untuk level up
-            let levelUpResult = await rpgs(normalizedBotName, user, 'level_up', {"username": user})
-            sm(levelUpResult, mtype, user)
-            break;
-    
-        case "reset":
-            // Panggil fungsi untuk reset user
-            let resetResult = await rpgs(normalizedBotName, user, 'reset_user', {"username": user})
-            sm(resetResult, mtype, user)
-            break;
-    
-        case "dungeon":
-            let dungeonResult = await get_rpgs(normalizedBotName, user, 'dungeon')
-            sm(dungeonResult, mtype, user)
-            break;
-    
-        case "battle":
-            let attackType = args[0] || 'physical'
-            console.log("Bertarung dengan serangan:", attackType)
-    
-            let battleResult = await rpgs(normalizedBotName, user, 'battle', {"username": user, "attack_type": attackType})
-            sm(battleResult, mtype, user)
-            break;
-    
-        case "loot":
-            let count = args[0] || 1 // default count 1 jika tidak diberikan
-            console.log("Membuka", count, "loot crates")
-    
-            // Panggil fungsi untuk membuka loot crates
-            let lootResult = await rpgs(normalizedBotName, user, 'open_loot_crates', {"username": user, "count": count})
-            sm(lootResult, mtype, user)
-            break;
-    
-        default:
-            sm('Perintah tidak di ketahui', mtype, user);
+
+            case 'reset': {
+                let result = await rpgs('guild_master', user, 'reset', {"username": user});
+                sm(result, mtype, user);
+                break;
+            }
+
+            default:
+                sm('Perintah tidak dikenali oleh Guild Master.', mtype, user);
+        }
+    } else if (idbot == 'dungeon_master') {
+        switch (cmd) {
+            case 'status':
+            case 'stats':
+            case 'stat': {
+                let result = await get_rpgs('dungeon_master', user, 'status');
+                sm(result, mtype, user);
+                break;
+            }
+
+            case 'levelup': {
+                let result = await rpgs('dungeon_master', user, 'levelup', {"username": user});
+                sm(result, mtype, user);
+                break;
+            }
+
+            case 'dungeon': {
+                let result = await get_rpgs('dungeon_master', user, 'dungeon');
+                sm(result, mtype, user);
+                break;
+            }
+
+            case 'atk':
+            case 'attack': {
+                let attackType = 'physical';
+                if (args[0]) {
+                    let at = args[0].toLowerCase();
+                    if (at === 'm') attackType = 'magic';
+                    else if (at === 'p') attackType = 'physical';
+                    else attackType = at;
+                }
+                let result = await rpgs('dungeon_master', user, 'battle', {"username": user, "attack_type": attackType});
+                sm(result, mtype, user);
+                break;
+            }
+
+            case 'loot': {
+                let count = parseInt(args[0]) || 1;
+                let result = await rpgs('dungeon_master', user, 'lootcrate', {"username": user, "count": count});
+                sm(result, mtype, user);
+                break;
+            }
+
+            default:
+                sm('Perintah tidak dikenali oleh Dungeon Master.', mtype, user);
+        }
+    } else {
+        sm('Bot tidak dikenali.', mtype, user);
     }
+
     
 }
 
-async function rpgs(normalizedBotName, user, cmd, payload = null) {
-      const url = `https://ptbot-server.vercel.app/${normalizedBotName}/${user}/${cmd}`;
+async function rpgs(idbot, user, cmd, payload = null) {
+      const url = `https://ptbot-server.vercel.app/${idbot}/${user}/${cmd}`;
       const options = {
         method: payload ? 'POST' : 'GET',
         headers: {
@@ -333,8 +345,8 @@ async function rpgs(normalizedBotName, user, cmd, payload = null) {
       
     }
 
-async function get_rpgs(normalizedBotName, user, cmd) {
-        const url = `https://ptbot-server.vercel.app/${normalizedBotName}/${user}/${cmd}`;
+async function get_rpgs(idbot, user, cmd) {
+        const url = `https://ptbot-server.vercel.app/${idbot}/${user}/${cmd}`;
         const options = {
             method: 'GET',
             headers: {
@@ -380,6 +392,10 @@ function settingMenu() {
             <div class="text-success py-1" style="display: flex; align-items: center;">
                 <label for="botInput" style="width: 200px;">Nama Bot</label>
                 <input class="form-control" type="text" id="botInput" name="bot" style="width: 200px; height: 20px;" placeholder="Masukkan nama bot..." required>
+            </div>
+            <div class="text-success py-1" style="display: flex; align-items: center;">
+                <label for="botInput" style="width: 200px;">ID Bot</label>
+                <input class="form-control" type="text" id="idbotInput" name="bot" style="width: 200px; height: 20px;" placeholder="Masukkan id bot..." required>
             </div>
             <div class="text-success py-1" style="display: flex; align-items: center;">
                 <label for="prefixInput" style="width: 200px;">Prefix</label>
@@ -506,6 +522,7 @@ function settingMenu() {
     button.addEventListener('click', function () {
         const ownerInput = document.getElementById('ownerInput');
         const botInput = document.getElementById('botInput');
+        const idbotInput = document.getElementById('idbotInput');
         const prefixInput = document.getElementById('prefixInput');
         const chatTypeSelect = document.getElementById('chatTypeSelect');
         const antiAfkInput = document.getElementById('antiAfkInput');
@@ -513,6 +530,7 @@ function settingMenu() {
         const chatTypeValue = chatTypeSelect.value;
         const ownerValue = ownerInput.value;
         const botValue = botInput.value;
+        const idbotValue = idbotInput.value;
         const antiAfkValue = antiAfkInput.value === "true";
         const prefixValue = prefixInput.value;
         if (!ownerValue || !botValue || !prefixValue || !chatTypeValue) {
@@ -525,7 +543,7 @@ function settingMenu() {
         prefix = prefixValue.split(',');
         chatTp = chatTypeValue;
         antiAfk = antiAfkValue;
-
+        idbot = idbotValue;
         if (botName === botValue) {
         } else {
             botName = botValue;
@@ -665,4 +683,4 @@ setTimeout(() => {
   fetchAndLogUsername();
   observeChat();
   settingMenu();
-}, 3000); // 3000 ms = 3 detik
+}, 3000); 
